@@ -14,7 +14,7 @@ export function Footer({ showCta = true }: { showCta?: boolean }) {
             <div className="absolute -bottom-32 left-1/3 size-72 rounded-full bg-ink-500/30 blur-3xl" aria-hidden="true" />
             <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div className="max-w-xl">
-                <h2 className="text-2xl font-bold text-white md:text-3xl">Besoin d'un coup de main pour votre mission ?</h2>
+                <h2 className="text-2xl font-bold text-white md:text-3xl">Besoin d'aide pour votre mission ?</h2>
                 <p className="mt-2 text-ink-200">L'équipe Playlife vous aide à trouver une structure, préparer votre pack et lancer votre collecte.</p>
               </div>
               <ButtonLink to="/contact" size="lg" iconRight={ArrowRight} className="shrink-0">Nous contacter</ButtonLink>

@@ -159,7 +159,7 @@ export default function Structures() {
 
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
                 {/* Liste */}
-                <div ref={listRef} className={cn('lg:h-[calc(100dvh-8rem)] lg:overflow-y-auto lg:pr-2 lg:[scrollbar-width:thin]', mobileView === 'map' && 'hidden lg:block')}>
+                <div ref={listRef} className={cn('lg:h-[calc(100dvh-8rem)] lg:overflow-y-auto lg:-m-1 lg:p-1 lg:pr-3 lg:[scrollbar-width:thin]', mobileView === 'map' && 'hidden lg:block')}>
                     {structures === null ? (
                         <div className="space-y-3">{[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}</div>
                     ) : filtered.length === 0 ? (
