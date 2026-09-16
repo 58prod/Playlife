@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { errorMessage } from '@/lib/errors';
 import { STRUCTURE_TYPES } from '@/lib/countries';
 import { formatDate } from '@/lib/format';
+import { countryLabel, fetchAllStructures, normalize } from '@/lib/structures';
 import type { Database, Structure, StructureStatus } from '@/types/database.types';
 
 type StructureUpdate = Database['public']['Tables']['structures']['Update'];
@@ -47,21 +48,27 @@ export function StructuresAdmin() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [draft, setDraft] = useState<EditableStructure>(EMPTY_STRUCTURE);
     const [creating, setCreating] = useState(false);
+    const [search, setSearch] = useState('');
 
     const fetchStructures = useCallback(async () => {
-        const { data, error } = await supabase.from('structures').select('*').order('created_at', { ascending: false });
-        if (error) toast.error(`Chargement des structures impossible : ${errorMessage(error)}`);
-        else setStructures(data);
+        try {
+            const data = await fetchAllStructures();
+            setStructures(data.sort((a, b) => b.created_at.localeCompare(a.created_at)));
+        } catch (error) {
+            toast.error(`Chargement des structures impossible : ${errorMessage(error)}`);
+        }
     }, []);
 
     useEffect(() => { fetchStructures(); }, [fetchStructures]);
 
-    const byStatus = (status: StructureStatus) => structures.filter(s => (s.status ?? 'à valider playlife') === status);
+    const q = normalize(search.trim());
+    const searched = q ? structures.filter(s => normalize([s.name, s.city, countryLabel(s), s.type, s.origin_info].join(' ')).includes(q)) : structures;
+    const byStatus = (status: StructureStatus) => searched.filter(s => (s.status ?? 'à valider playlife') === status);
     const lists: Record<Filter, Structure[]> = {
         pending: byStatus('à valider playlife'),
         validated: byStatus('validée'),
         refused: byStatus('refusée'),
-        all: structures,
+        all: searched,
     };
     const { pageItems, totalPages, safePage } = paginate(lists[filter], page);
 
@@ -160,7 +167,15 @@ export function StructuresAdmin() {
                 </div>
             )}
 
-            <div className="mb-4">
+            <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <input
+                    type="search"
+                    value={search}
+                    onChange={e => { setSearch(e.target.value); setPage(1); }}
+                    placeholder="Rechercher (nom, ville, pays, catégorie…)"
+                    aria-label="Rechercher une structure"
+                    className={`${adminInputClass} lg:max-w-sm`}
+                />
                 <FilterTabs
                     label="Filtrer les structures"
                     value={filter}
@@ -169,7 +184,7 @@ export function StructuresAdmin() {
                         { value: 'pending', label: 'À valider', count: lists.pending.length },
                         { value: 'validated', label: 'Validées', count: lists.validated.length },
                         { value: 'refused', label: 'Refusées', count: lists.refused.length },
-                        { value: 'all', label: 'Toutes', count: structures.length },
+                        { value: 'all', label: 'Toutes', count: searched.length },
                     ]}
                 />
             </div>
@@ -198,7 +213,7 @@ export function StructuresAdmin() {
                                                         </span>
                                                     )}
                                                 </span>
-                                                <span className="block text-xs text-gray-500 mt-0.5">{[structure.type, [structure.city, structure.country].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}</span>
+                                                <span className="block text-xs text-gray-500 mt-0.5">{[structure.type, [structure.city, countryLabel(structure)].filter(Boolean).join(', '), structure.source && 'import annuaire'].filter(Boolean).join(' · ')}</span>
                                             </span>
                                         </button>
                                         <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -238,7 +253,7 @@ export function StructuresAdmin() {
                                                     {structure.contact_phone && <p><span className="text-gray-500">Téléphone :</span> <span className="font-medium">{structure.contact_phone}</span></p>}
                                                     {(structure.address || structure.postal_code) && <p><span className="text-gray-500">Adresse :</span> <span className="font-medium">{[structure.address, structure.postal_code].filter(Boolean).join(', ')}</span></p>}
                                                     {structure.website_url && <p className="md:col-span-2"><span className="text-gray-500">Site web :</span> <a href={structure.website_url} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline break-all">{structure.website_url}</a></p>}
-                                                    {structure.origin_info && <p className="md:col-span-2 bg-white p-3 rounded-lg border border-gray-100"><span className="text-gray-500 block mb-1">Comment la personne connaît la structure :</span><span className="italic text-gray-700">{structure.origin_info}</span></p>}
+                                                    {structure.origin_info && <p className="md:col-span-2 bg-white p-3 rounded-lg border border-gray-100"><span className="text-gray-500 block mb-1">{structure.source ? 'Note d\'import :' : 'Comment la personne connaît la structure :'}</span><span className="italic text-gray-700">{structure.origin_info}</span></p>}
                                                     <p><span className="text-gray-500">Proposée le :</span> <span className="font-medium">{formatDate(structure.created_at)}</span></p>
                                                 </div>
                                             )}

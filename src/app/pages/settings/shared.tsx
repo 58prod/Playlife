@@ -35,17 +35,22 @@ export function FilterTabs<T extends string>({ value, onChange, options, label }
 
 export function Pagination({ page, total, onChange, label }: { page: number; total: number; onChange: (page: number) => void; label: string }) {
     if (total <= 1) return null;
-    const btn = 'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    const btn = 'min-w-9 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    // Fenêtre de pages autour de la page courante : 1 … 4 5 [6] 7 8 … 194
+    const pages = [...new Set([1, total, ...Array.from({ length: 5 }, (_, i) => page - 2 + i)])].filter(p => p >= 1 && p <= total).sort((a, b) => a - b);
     return (
-        <nav className="flex flex-wrap items-center justify-center gap-2 mt-4" aria-label={label}>
-            <button type="button" onClick={() => onChange(page - 1)} disabled={page === 1} className={`${btn} bg-white border border-gray-200 text-gray-700 hover:bg-gray-50`} aria-label="Page précédente">←</button>
-            {Array.from({ length: total }, (_, i) => i + 1).map(p => (
-                <button key={p} type="button" onClick={() => onChange(p)} aria-current={p === page ? 'page' : undefined}
-                    className={`${btn} ${p === page ? 'bg-ink-900 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                    {p}
-                </button>
+        <nav className="flex flex-wrap items-center justify-center gap-1.5 mt-4" aria-label={label}>
+            <button type="button" onClick={() => onChange(page - 1)} disabled={page === 1} className={`${btn} bg-white ring-1 ring-gray-200 text-gray-700 hover:bg-gray-50`} aria-label="Page précédente">←</button>
+            {pages.map((p, i) => (
+                <span key={p} className="flex items-center gap-1.5">
+                    {i > 0 && p - pages[i - 1] > 1 && <span className="px-1 text-gray-400">…</span>}
+                    <button type="button" onClick={() => onChange(p)} aria-current={p === page ? 'page' : undefined}
+                        className={`${btn} ${p === page ? 'bg-ink-900 text-white' : 'bg-white ring-1 ring-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                        {p}
+                    </button>
+                </span>
             ))}
-            <button type="button" onClick={() => onChange(page + 1)} disabled={page === total} className={`${btn} bg-white border border-gray-200 text-gray-700 hover:bg-gray-50`} aria-label="Page suivante">→</button>
+            <button type="button" onClick={() => onChange(page + 1)} disabled={page === total} className={`${btn} bg-white ring-1 ring-gray-200 text-gray-700 hover:bg-gray-50`} aria-label="Page suivante">→</button>
         </nav>
     );
 }

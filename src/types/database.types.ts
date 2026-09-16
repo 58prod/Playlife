@@ -12,6 +12,34 @@ type Table<Row, Required extends keyof Row = never> = {
     Relationships: [];
 };
 
+type StructureRow = {
+    id: string;
+    name: string;
+    description: string | null;
+    type: string | null;
+    address: string | null;
+    postal_code: string | null;
+    city: string | null;
+    country: string | null;
+    contact_name: string | null;
+    contact_email: string | null;
+    contact_phone: string | null;
+    website_url: string | null;
+    image_url: string | null;
+    status: StructureStatus | null;
+    validated_by_playlife: boolean | null;
+    origin_info: string | null;
+    created_by: string | null;
+    created_at: string;
+    country_code: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    google_place_id: string | null;
+    source: string | null;
+};
+
+type Tables_structures = StructureRow;
+
 export interface Database {
     public: {
         Tables: {
@@ -52,26 +80,7 @@ export interface Database {
                 created_at: string;
                 created_by: string | null;
             }, 'mission_id' | 'media_url' | 'media_type'>;
-            structures: Table<{
-                id: string;
-                name: string;
-                description: string | null;
-                type: string | null;
-                address: string | null;
-                postal_code: string | null;
-                city: string | null;
-                country: string | null;
-                contact_name: string | null;
-                contact_email: string | null;
-                contact_phone: string | null;
-                website_url: string | null;
-                image_url: string | null;
-                status: StructureStatus | null;
-                validated_by_playlife: boolean | null;
-                origin_info: string | null;
-                created_by: string | null;
-                created_at: string;
-            }, 'name'>;
+            structures: Table<StructureRow, 'name'>;
             site_config: Table<{
                 key: string;
                 value: Json;
@@ -80,7 +89,12 @@ export interface Database {
             }, 'key' | 'value'>;
         };
         Views: { [_ in never]: never };
-        Functions: { [_ in never]: never };
+        Functions: {
+            get_structures_annuaire: {
+                Args: never;
+                Returns: Array<Pick<Tables_structures, 'id' | 'name' | 'type' | 'description' | 'city' | 'country' | 'country_code' | 'website_url' | 'image_url' | 'validated_by_playlife' | 'created_at' | 'latitude' | 'longitude' | 'address' | 'postal_code' | 'contact_name' | 'contact_email' | 'contact_phone' | 'google_place_id'>>;
+            };
+        };
         Enums: { [_ in never]: never };
         CompositeTypes: { [_ in never]: never };
     };
