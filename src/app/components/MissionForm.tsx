@@ -1,541 +1,344 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 import {
-    X, Calendar, MapPin, Type, AlignLeft, Send,
-    Plane, GraduationCap, ArrowRight, ArrowLeft,
-    CheckCircle2, Globe, Sparkles, Link, Upload
+    AlignLeft, ArrowLeft, ArrowRight, Calendar, CheckCircle2, Globe, GraduationCap,
+    Link as LinkIcon, Loader2, MapPin, Plane, Send, Type, Upload, X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { errorMessage } from '@/lib/errors';
+import { formatDateRange } from '@/lib/format';
+import { removePublicFile, uploadPublicFile, validateUpload } from '@/lib/storage';
+import type { Mission, MissionStatus, UserType } from '@/types/database.types';
+import { Modal } from './Modal';
 
 interface MissionFormProps {
     onClose: () => void;
     onSuccess: () => void;
-    initialData?: any; // Données initiales pour l'édition
+    /** Mission existante à modifier (sinon création) */
+    initialData?: Mission;
+}
+
+interface FormState {
+    mission_type: UserType | '';
+    title: string;
+    country: string;
+    city: string;
+    start_date: string;
+    end_date: string;
+    fundraising_url: string;
+    description: string;
+    image_url: string;
+    status: MissionStatus;
+}
+
+const TOTAL_STEPS = 4;
+const STEP_TITLES = ['Quel est votre profil ?', 'Où et quand partez-vous ?', 'Parlez-nous du projet', "Prêt à lancer l'impact ?"];
+const LEETCHI_URL = 'https://www.leetchi.org/project/playlife';
+
+const inputClass = 'w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all';
+
+function Field({ id, label, icon: Icon, children }: { id?: string; label: string; icon: typeof Type; children: React.ReactNode }) {
+    return (
+        <div>
+            <label htmlFor={id} className="block text-sm font-bold text-gray-700 mb-2 px-1">{label}</label>
+            <div className="relative group">
+                <Icon className="absolute left-4 top-[1.15rem] w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors pointer-events-none" aria-hidden="true" />
+                {children}
+            </div>
+        </div>
+    );
 }
 
 export function MissionForm({ onClose, onSuccess, initialData }: MissionFormProps) {
-    useEffect(() => {
-        console.log('[MissionForm] Mounted');
-        return () => console.log('[MissionForm] Unmounted');
-    }, []);
-
     const { user } = useAuth();
-    const [loading, setLoading] = useState(false);
+    const isEditing = !!initialData;
     const [step, setStep] = useState(1);
-    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [saving, setSaving] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
-    const [formData, setFormData] = useState({
-        title: initialData?.title || '',
-        description: initialData?.description || '',
-        location: initialData?.location || '',
-        country: initialData?.country || '',
-        city: initialData?.city || '',
-        start_date: initialData?.start_date || '',
-        end_date: initialData?.end_date || '',
-        image_url: initialData?.image_url || '',
-        mission_type: initialData?.mission_type || '', // 'voyageur' or 'animateur'
-        fundraising_url: initialData?.fundraising_url || '', // URL de la cagnotte
-        status: initialData?.status || 'active'
+    const [error, setError] = useState<string | null>(null);
+    const [form, setForm] = useState<FormState>({
+        mission_type: initialData?.mission_type ?? '',
+        title: initialData?.title ?? '',
+        country: initialData?.country ?? '',
+        city: initialData?.city ?? '',
+        start_date: initialData?.start_date ?? '',
+        end_date: initialData?.end_date ?? '',
+        fundraising_url: initialData?.fundraising_url ?? '',
+        description: initialData?.description ?? '',
+        image_url: initialData?.image_url ?? '',
+        status: initialData?.status ?? 'active',
     });
 
-    const isEditing = !!initialData;
+    const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm(prev => ({ ...prev, [key]: value }));
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+        set(e.target.name as keyof FormState, e.target.value as never);
 
-    const totalSteps = 4;
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (step < totalSteps) {
-            setStep(step + 1);
-            return;
+    /** Retourne un message si l'étape courante est incomplète, sinon null. */
+    const stepError = (): string | null => {
+        if (step === 1 && !form.mission_type) return 'Choisissez un type de mission.';
+        if (step === 2) {
+            if (!form.title.trim() || !form.country.trim() || !form.city.trim()) return 'Renseignez le titre, le pays et la ville.';
+            if (!form.start_date || !form.end_date) return 'Renseignez les dates de départ et de retour.';
+            if (form.end_date < form.start_date) return 'La date de retour doit être postérieure à la date de départ.';
         }
-
-        setLoading(true);
-
-        try {
-            if (isEditing) {
-                // Mode édition
-                const { error } = await (supabase
-                    .from('missions') as any)
-                    .update(formData)
-                    .eq('id', initialData.id);
-
-                if (error) throw error;
-            } else {
-                // Mode création — mission invisible par défaut, en attente de modération
-                const { data: inserted, error } = await (supabase
-                    .from('missions') as any)
-                    .insert({
-                        ...formData,
-                        created_by: user?.id,
-                        status: 'active',
-                        visible: false
-                    })
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                // Notification email à l'équipe Playlife
-                try {
-                    await supabase.functions.invoke('notify-new-mission', {
-                        body: { missionTitle: formData.title, missionId: inserted?.id }
-                    });
-                } catch (emailErr) {
-                    console.warn('Notification email non envoyée :', emailErr);
-                }
-            }
-
-            onSuccess();
-            onClose();
-        } catch (error: any) {
-            console.error(`Error ${isEditing ? 'updating' : 'creating'} mission:`, error);
-            alert(`Erreur lors de ${isEditing ? 'la modification' : 'la création'} de la mission: ${error.message || 'Erreur inconnue'}`);
-        } finally {
-            setLoading(false);
-        }
+        if (step === 3 && !form.description.trim()) return 'Décrivez votre projet en quelques lignes.';
+        return null;
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
+        e.target.value = '';
+        if (!file || !user) return;
+        const invalid = validateUpload(file);
+        if (invalid) { toast.error(invalid); return; }
 
-        // Vérifier la taille du fichier (5Mo max)
-        const maxSize = 5 * 1024 * 1024; // 5Mo en bytes
-        if (file.size > maxSize) {
-            alert('L\'image ne doit pas dépasser 5Mo');
-            e.target.value = '';
-            return;
-        }
-
-        // Vérifier le type de fichier
-        if (!file.type.startsWith('image/')) {
-            alert('Veuillez sélectionner une image');
-            e.target.value = '';
-            return;
-        }
-
-        setImageFile(file);
         setUploadingImage(true);
-
         try {
-            if (!user?.id) {
-                throw new Error('Utilisateur non authentifié');
-            }
-
-            // Stocker l'image dans un dossier propriétaire pour faire respecter les policies Storage
-            const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const filePath = `${user.id}/${Date.now()}_${safeFileName}`;
-
-            // Upload vers Supabase Storage
-            const { error: uploadError } = await supabase.storage
-                .from('missions')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            // Récupérer l'URL publique
-            const { data: { publicUrl } } = supabase.storage
-                .from('missions')
-                .getPublicUrl(filePath);
-
-            setFormData(prev => ({ ...prev, image_url: publicUrl }));
-        } catch (error: any) {
-            console.error('Error uploading image:', error);
-            alert(`Erreur lors de l'upload de l'image: ${error.message || 'Erreur inconnue'}`);
-            setImageFile(null);
+            const url = await uploadPublicFile('missions', user.id, file);
+            // Supprime l'image précédente si elle vient d'être envoyée dans ce formulaire
+            if (form.image_url && form.image_url !== initialData?.image_url) await removePublicFile('missions', form.image_url);
+            set('image_url', url);
+        } catch (err) {
+            toast.error(`Envoi de l'image impossible : ${errorMessage(err)}`);
         } finally {
             setUploadingImage(false);
         }
     };
 
-    const validateStep = () => {
-        if (step === 1) return formData.mission_type !== '';
-        if (step === 2) {
-            return (
-                formData.title !== '' &&
-                formData.country !== '' &&
-                formData.city !== '' &&
-                formData.start_date !== '' &&
-                formData.end_date !== ''
-            );
-        }
-        if (step === 3) return formData.description !== '';
-        return true;
-    };
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        const invalid = stepError();
+        if (invalid) { setError(invalid); return; }
+        setError(null);
+        if (step < TOTAL_STEPS) { setStep(step + 1); return; }
+        if (!user || !form.mission_type) return;
 
-    const nextStep = () => {
-        if (step === 2) {
-            if (!formData.title || !formData.country || !formData.city) return;
-            if (!formData.start_date || !formData.end_date) {
-                alert('Veuillez renseigner les dates de départ et de retour');
-                return;
+        setSaving(true);
+        const payload = {
+            mission_type: form.mission_type,
+            title: form.title.trim(),
+            country: form.country.trim(),
+            city: form.city.trim(),
+            start_date: form.start_date,
+            end_date: form.end_date,
+            fundraising_url: form.fundraising_url.trim() || null,
+            description: form.description.trim(),
+            image_url: form.image_url || null,
+        };
+
+        try {
+            if (initialData) {
+                const { error: updateError } = await supabase
+                    .from('missions')
+                    .update({ ...payload, status: form.status })
+                    .eq('id', initialData.id);
+                if (updateError) throw updateError;
+                if (initialData.image_url && initialData.image_url !== form.image_url) {
+                    await removePublicFile('missions', initialData.image_url).catch(() => undefined);
+                }
+                toast.success('Mission mise à jour.');
+            } else {
+                // Création : la mission reste invisible jusqu'à validation par un administrateur
+                const { data: inserted, error: insertError } = await supabase
+                    .from('missions')
+                    .insert({ ...payload, created_by: user.id, status: 'active', visible: false })
+                    .select('id')
+                    .single();
+                if (insertError) throw insertError;
+
+                supabase.functions
+                    .invoke('notify-new-mission', { body: { missionId: inserted.id } })
+                    .catch(() => undefined); // la notification ne doit jamais bloquer la création
+
+                toast.success('Mission créée !', {
+                    description: "Elle sera visible publiquement dès sa validation par l'équipe Playlife.",
+                });
             }
-        }
-        if (validateStep()) {
-            setStep(prev => Math.min(prev + 1, totalSteps));
+            onSuccess();
+            onClose();
+        } catch (err) {
+            setError(`${isEditing ? 'Modification' : 'Création'} impossible : ${errorMessage(err)}`);
+        } finally {
+            setSaving(false);
         }
     };
 
-    const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
-
-    const progress = (step / totalSteps) * 100;
+    const typeOption = (value: UserType, title: string, text: string, Icon: typeof Plane) => (
+        <button
+            type="button"
+            onClick={() => set('mission_type', value)}
+            aria-pressed={form.mission_type === value}
+            className={`p-6 rounded-3xl border-2 transition-all text-left flex items-start gap-4 ${form.mission_type === value ? 'border-[#e6244d] bg-[#e6244d]/5 ring-4 ring-[#e6244d]/10' : 'border-gray-100 hover:border-gray-200 bg-white'}`}
+        >
+            <span className={`p-3 rounded-2xl ${form.mission_type === value ? 'bg-[#e6244d] text-white' : 'bg-gray-50 text-gray-400'}`}>
+                <Icon className="w-6 h-6" />
+            </span>
+            <span>
+                <span className="block font-bold text-lg text-[#22081c]">{title}</span>
+                <span className="block text-gray-500 text-sm leading-relaxed">{text}</span>
+            </span>
+        </button>
+    );
 
     return (
-        <div className="fixed inset-0 bg-[#22081c]/60 z-50 flex items-center justify-center p-4 backdrop-blur-md transition-all duration-300">
-            <div className="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/20 animate-in fade-in zoom-in duration-300">
-
-                {/* Progress Bar & Header */}
-                <div className="px-8 pt-5 pb-0 flex justify-end">
-                    <button
-                        onClick={onClose}
-                        aria-label="Fermer"
-                        className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-400 hover:text-[#e6244d]"
-                    >
+        <Modal onClose={onClose} label={isEditing ? 'Modifier la mission' : 'Créer une mission'} className="w-full max-w-xl">
+            <form onSubmit={handleSubmit} noValidate className="bg-white w-full rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="px-6 md:px-8 pt-5 flex justify-end">
+                    <button type="button" onClick={onClose} aria-label="Fermer" className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-400 hover:text-[#e6244d]">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
-                <div className="px-8 pt-2 flex flex-col items-center">
-                    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-6">
-                        <div
-                            className="h-full bg-gradient-to-r from-[#e6244d] to-[#ff4d71] transition-all duration-500 ease-out"
-                            style={{ width: `${progress}%` }}
-                        />
+                <div className="px-6 md:px-8 pt-2 flex flex-col items-center">
+                    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-6" aria-hidden="true">
+                        <div className="h-full bg-gradient-to-r from-[#e6244d] to-[#ff4d71] transition-all duration-500" style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} />
                     </div>
-
                     <p className="text-[#e6244d] font-bold text-xs uppercase tracking-[0.2em] mb-2">
-                        {isEditing ? 'Modification' : `Étape ${step} sur ${totalSteps}`}
+                        {isEditing ? 'Modification — ' : ''}Étape {step} sur {TOTAL_STEPS}
                     </p>
-                    <h2 className="text-2xl font-black text-[#22081c] mb-8 text-center">
-                        {isEditing ? "Modifier la mission" : (
-                            <>
-                                {step === 1 && "Quel est votre profil ?"}
-                                {step === 2 && "Où et quand partez-vous ?"}
-                                {step === 3 && "Parlez-nous du projet"}
-                                {step === 4 && "Prêt à lancer l'impact ?"}
-                            </>
-                        )}
-                    </h2>
+                    <h2 className="text-2xl font-black text-[#22081c] mb-6 text-center">{STEP_TITLES[step - 1]}</h2>
                 </div>
 
-                {/* Form Body */}
-                <div className="flex-1 overflow-y-auto px-8 pb-8">
+                <div className="flex-1 overflow-y-auto px-6 md:px-8 pb-6">
                     {step === 1 && (
-                        <div className="grid grid-cols-1 gap-4 animate-in slide-in-from-bottom-4 duration-500">
-                            <button
-                                type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, mission_type: 'voyageur' }))}
-                                className={`p-6 rounded-3xl border-2 transition-all text-left flex items-start gap-4 ${formData.mission_type === 'voyageur'
-                                    ? 'border-[#e6244d] bg-[#e6244d]/5 ring-4 ring-[#e6244d]/10'
-                                    : 'border-gray-100 hover:border-gray-200 bg-white'
-                                    }`}
-                            >
-                                <div className={`p-3 rounded-2xl ${formData.mission_type === 'voyageur' ? 'bg-[#e6244d] text-white' : 'bg-gray-50 text-gray-400'}`}>
-                                    <Plane className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg text-[#22081c]">Voyageur Solidaire</h3>
-                                    <p className="text-gray-500 text-sm leading-relaxed">Je pars en voyage et je souhaite remettre un pack de matériel sportif.</p>
-                                </div>
-                            </button>
+                        <div className="grid grid-cols-1 gap-4">
+                            {typeOption('voyageur', 'Voyageur solidaire', 'Je pars en voyage et je souhaite remettre un pack de matériel sportif.', Plane)}
+                            {typeOption('animateur', 'Animateur / Enseignant', "J'encadre des enfants et je souhaite les faire participer à une action solidaire.", GraduationCap)}
 
-                            <button
-                                type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, mission_type: 'animateur' }))}
-                                className={`p-6 rounded-3xl border-2 transition-all text-left flex items-start gap-4 ${formData.mission_type === 'animateur'
-                                    ? 'border-[#e6244d] bg-[#e6244d]/5 ring-4 ring-[#e6244d]/10'
-                                    : 'border-gray-100 hover:border-gray-200 bg-white'
-                                    }`}
-                            >
-                                <div className={`p-3 rounded-2xl ${formData.mission_type === 'animateur' ? 'bg-[#e6244d] text-white' : 'bg-gray-50 text-gray-400'}`}>
-                                    <GraduationCap className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg text-[#22081c]">Animateur / Enseignant</h3>
-                                    <p className="text-gray-500 text-sm leading-relaxed">J'encadre des enfants et je souhaite les faire participer à une action solidaire.</p>
-                                </div>
-                            </button>
-                        </div>
-                    )}
-
-                    {step === 1 && isEditing && (
-                        <div className="mt-8 space-y-4 animate-in slide-in-from-bottom-4 duration-500 delay-150">
-                            <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Statut de la mission</label>
-                            <div className="flex gap-2 p-1 bg-gray-50 rounded-2xl border border-gray-100">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, status: 'active' }))}
-                                    className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${formData.status === 'active'
-                                        ? 'bg-white text-blue-600 shadow-sm border border-gray-100'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                >
-                                    EN COURS
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, status: 'completed' }))}
-                                    className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${formData.status === 'completed'
-                                        ? 'bg-white text-green-600 shadow-sm border border-gray-100'
-                                        : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                >
-                                    TERMINÉE
-                                </button>
-                            </div>
+                            {isEditing && (
+                                <fieldset className="mt-4">
+                                    <legend className="block text-sm font-bold text-gray-700 mb-2 px-1">Statut de la mission</legend>
+                                    <div className="flex gap-2 p-1 bg-gray-50 rounded-2xl border border-gray-100">
+                                        {(['active', 'completed'] as const).map(status => (
+                                            <button
+                                                key={status}
+                                                type="button"
+                                                onClick={() => set('status', status)}
+                                                aria-pressed={form.status === status}
+                                                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all ${form.status === status ? `bg-white shadow-sm border border-gray-100 ${status === 'active' ? 'text-blue-600' : 'text-green-600'}` : 'text-gray-500 hover:text-gray-700'}`}
+                                            >
+                                                {status === 'active' ? 'En cours' : 'Terminée'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </fieldset>
+                            )}
                         </div>
                     )}
 
                     {step === 2 && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                            <div>
-                                <label htmlFor="mission-title" className="block text-sm font-bold text-gray-700 mb-2 px-1">Titre de votre mission</label>
-                                <div className="relative group">
-                                    <Type className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                    <input
-                                        id="mission-title"
-                                        required
-                                        type="text"
-                                        name="title"
-                                        value={formData.title}
-                                        onChange={handleChange}
-                                        placeholder="Ex: Foot pour tous au Sénégal"
-                                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all"
-                                    />
-                                </div>
+                        <div className="space-y-6">
+                            <Field id="mission-title" label="Titre de votre mission" icon={Type}>
+                                <input id="mission-title" name="title" type="text" required maxLength={120} value={form.title} onChange={handleChange} placeholder="Ex : Foot pour tous au Sénégal" className={inputClass} />
+                            </Field>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <Field id="mission-country" label="Pays" icon={Globe}>
+                                    <input id="mission-country" name="country" type="text" required value={form.country} onChange={handleChange} placeholder="Sénégal" className={inputClass} />
+                                </Field>
+                                <Field id="mission-city" label="Ville" icon={MapPin}>
+                                    <input id="mission-city" name="city" type="text" required value={form.city} onChange={handleChange} placeholder="Dakar" className={inputClass} />
+                                </Field>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="mission-country" className="block text-sm font-bold text-gray-700 mb-2 px-1">Pays</label>
-                                    <div className="relative group">
-                                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                        <input
-                                            id="mission-country"
-                                            required
-                                            type="text"
-                                            name="country"
-                                            value={formData.country}
-                                            onChange={handleChange}
-                                            placeholder="Sénégal"
-                                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label htmlFor="mission-city" className="block text-sm font-bold text-gray-700 mb-2 px-1">Ville</label>
-                                    <div className="relative group">
-                                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                        <input
-                                            id="mission-city"
-                                            required
-                                            type="text"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleChange}
-                                            placeholder="Dakar"
-                                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all"
-                                        />
-                                    </div>
-                                </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <Field id="mission-start-date" label="Départ (estimé)" icon={Calendar}>
+                                    <input id="mission-start-date" name="start_date" type="date" required value={form.start_date} onChange={handleChange} className={inputClass} />
+                                </Field>
+                                <Field id="mission-end-date" label="Retour (estimé)" icon={Calendar}>
+                                    <input id="mission-end-date" name="end_date" type="date" required min={form.start_date || undefined} value={form.end_date} onChange={handleChange} className={inputClass} />
+                                </Field>
                             </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Dates estimées de départ et de retour</label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="relative group">
-                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                        <input
-                                            id="mission-start-date"
-                                            required
-                                            type="date"
-                                            name="start_date"
-                                            aria-label="Date de départ estimée"
-                                            value={formData.start_date}
-                                            onChange={handleChange}
-                                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all"
-                                        />
-                                    </div>
-                                    <div className="relative group">
-                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                        <input
-                                            id="mission-end-date"
-                                            required
-                                            type="date"
-                                            name="end_date"
-                                            aria-label="Date de retour estimée"
-                                            value={formData.end_date}
-                                            onChange={handleChange}
-                                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-pink-50 border border-pink-100 rounded-2xl p-4">
-                                <p className="text-sm text-gray-700 mb-3">
+                            <div className="bg-pink-50 border border-pink-100 rounded-2xl p-4 space-y-3">
+                                <p className="text-sm text-gray-700">
                                     <span className="font-bold">💰 Besoin de financer votre mission ?</span><br />
-                                    Créez votre cagnotte liée à Playlife grâce au lien suivant : <a href="https://www.leetchi.org/project/playlife" target="_blank" rel="noopener noreferrer" className="text-[#e6244d] underline hover:text-[#c91d41]">leetchi.org</a>
+                                    Créez votre cagnotte liée à Playlife :{' '}
+                                    <a href={LEETCHI_URL} target="_blank" rel="noopener noreferrer" className="text-[#e6244d] underline hover:text-[#c91d41]">leetchi.org</a>
                                 </p>
-                                <label htmlFor="mission-fundraising" className="block text-sm font-bold text-gray-700 mb-2 px-1">Lien de votre cagnotte (optionnel)</label>
-                                <div className="relative group">
-                                    <Link className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                    <input
-                                        id="mission-fundraising"
-                                        type="url"
-                                        name="fundraising_url"
-                                        value={formData.fundraising_url}
-                                        onChange={handleChange}
-                                        placeholder="https://www.leetchi.org/project/playlife"
-                                        className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all"
-                                    />
-                                </div>
+                                <Field id="mission-fundraising" label="Lien de votre cagnotte (optionnel)" icon={LinkIcon}>
+                                    <input id="mission-fundraising" name="fundraising_url" type="url" value={form.fundraising_url} onChange={handleChange} placeholder={LEETCHI_URL} className={`${inputClass} bg-white`} />
+                                </Field>
                             </div>
                         </div>
                     )}
 
                     {step === 3 && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                        <div className="space-y-6">
+                            <Field id="mission-description" label="Description du projet" icon={AlignLeft}>
+                                <textarea id="mission-description" name="description" required rows={5} maxLength={2000} value={form.description} onChange={handleChange} placeholder="Quels sont vos objectifs ? Quelles structures allez-vous aider ?" className={`${inputClass} resize-none`} />
+                            </Field>
                             <div>
-                                <label htmlFor="mission-description" className="block text-sm font-bold text-gray-700 mb-2 px-1">Description du projet</label>
-                                <div className="relative group">
-                                    <AlignLeft className="absolute left-4 top-4 w-5 h-5 text-gray-400 group-focus-within:text-[#e6244d] transition-colors" aria-hidden="true" />
-                                    <textarea
-                                        id="mission-description"
-                                        required
-                                        name="description"
-                                        rows={5}
-                                        value={formData.description}
-                                        onChange={handleChange}
-                                        placeholder="Quels sont vos objectifs ? Quelles structures allez-vous aider ?"
-                                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#e6244d]/10 focus:border-[#e6244d] font-medium transition-all resize-none"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label htmlFor="mission-image" className="block text-sm font-bold text-gray-700 mb-2 px-1">Image de couverture (max 5Mo)</label>
-                                <div className="space-y-3">
-                                    <label className="relative group cursor-pointer">
-                                        <input
-                                            id="mission-image"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            className="hidden"
-                                        />
-                                        <div className="w-full px-6 py-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl hover:border-[#e6244d] hover:bg-pink-50 transition-all flex items-center justify-center gap-3 group-hover:shadow-md">
-                                            <Upload className="w-5 h-5 text-gray-400 group-hover:text-[#e6244d] transition-colors" />
-                                            <span className="font-medium text-gray-600 group-hover:text-[#e6244d] transition-colors">
-                                                {uploadingImage ? 'Upload en cours...' : imageFile ? imageFile.name : 'Parcourir et choisir une image'}
-                                            </span>
-                                        </div>
-                                    </label>
-                                    {formData.image_url && (
-                                        <div className="relative rounded-2xl overflow-hidden border border-gray-200">
-                                            <img src={formData.image_url} alt="Aperçu" className="w-full h-48 object-cover" />
-                                            <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                Image uploadée
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                <p className="block text-sm font-bold text-gray-700 mb-2 px-1">Image de couverture (optionnel, 5 Mo max)</p>
+                                <label className={`w-full px-6 py-4 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl hover:border-[#e6244d] hover:bg-pink-50 transition-all flex items-center justify-center gap-3 ${uploadingImage ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}>
+                                    <input type="file" accept="image/*" onChange={handleImageChange} className="sr-only" disabled={uploadingImage} />
+                                    {uploadingImage ? <Loader2 className="w-5 h-5 animate-spin text-[#e6244d]" /> : <Upload className="w-5 h-5 text-gray-400" />}
+                                    <span className="font-medium text-gray-600">
+                                        {uploadingImage ? 'Envoi en cours…' : form.image_url ? "Remplacer l'image" : 'Choisir une image'}
+                                    </span>
+                                </label>
+                                {form.image_url && (
+                                    <div className="relative mt-3 rounded-2xl overflow-hidden border border-gray-200">
+                                        <img src={form.image_url} alt="Aperçu de l'image de couverture" className="w-full h-48 object-cover" />
+                                        <button type="button" onClick={() => set('image_url', '')} className="absolute top-2 right-2 bg-white/95 text-gray-700 px-3 py-1 rounded-full text-xs font-bold hover:text-red-600">
+                                            Retirer
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
 
                     {step === 4 && (
-                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                        <div className="space-y-6">
                             <div className="bg-gray-50 rounded-[2rem] p-6 space-y-4 border border-gray-100">
                                 <div className="flex items-center gap-4 border-b border-gray-200 pb-4">
                                     <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-[#e6244d]">
-                                        {formData.mission_type === 'voyageur' ? <Plane className="w-6 h-6" /> : <GraduationCap className="w-6 h-6" />}
+                                        {form.mission_type === 'voyageur' ? <Plane className="w-6 h-6" /> : <GraduationCap className="w-6 h-6" />}
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold text-gray-400 uppercase">Type de Mission</p>
-                                        <p className="font-bold text-[#22081c]">
-                                            {formData.mission_type === 'voyageur' ? 'Voyageur Solidaire' : 'Animateur / Enseignant'}
-                                        </p>
+                                        <p className="text-xs font-bold text-gray-400 uppercase">Type de mission</p>
+                                        <p className="font-bold text-[#22081c]">{form.mission_type === 'voyageur' ? 'Voyageur solidaire' : 'Animateur / Enseignant'}</p>
                                     </div>
                                 </div>
-
                                 <div className="space-y-2">
-                                    <p className="text-xs font-bold text-gray-400 uppercase">Détails de la mission</p>
-                                    <h4 className="text-xl font-bold text-[#22081c]">{formData.title}</h4>
+                                    <h3 className="text-xl font-bold text-[#22081c] break-words">{form.title}</h3>
                                     <div className="flex flex-wrap gap-4 text-sm text-gray-600 font-medium">
-                                        <div className="flex items-center gap-1.5">
-                                            <MapPin className="w-4 h-4 text-[#e6244d]" />
-                                            {formData.city}, {formData.country}
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <Calendar className="w-4 h-4 text-[#e6244d]" />
-                                            Du {new Date(formData.start_date).toLocaleDateString()} au {new Date(formData.end_date).toLocaleDateString()}
-                                        </div>
+                                        <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-[#e6244d]" />{form.city}, {form.country}</span>
+                                        <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-[#e6244d]" />{formatDateRange(form.start_date, form.end_date)}</span>
                                     </div>
                                 </div>
-
-                                <div className="pt-2">
-                                    <p className="text-xs font-bold text-gray-400 uppercase mb-2">Description</p>
-                                    <p className="text-sm text-gray-600 leading-relaxed italic">
-                                        "{formData.description}"
-                                    </p>
+                                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line break-words">{form.description}</p>
+                            </div>
+                            {!isEditing && (
+                                <div className="flex items-start gap-3 p-4 bg-blue-50 text-blue-800 rounded-2xl text-sm border border-blue-100">
+                                    <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
+                                    Votre mission sera publiée après une rapide validation par l'équipe Playlife.
                                 </div>
-                            </div>
-
-                            <div className="flex items-center gap-3 p-4 bg-green-50 text-green-700 rounded-3xl text-sm font-medium border border-green-100">
-                                <CheckCircle2 className="w-5 h-5 shrink-0" />
-                                Votre mission respecte la charte de solidarité Playlife.
-                            </div>
+                            )}
                         </div>
                     )}
+
+                    {error && <p className="mt-4 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl" role="alert">{error}</p>}
                 </div>
 
-                {/* Footer Actions */}
-                <div className="p-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between gap-4">
+                <div className="p-6 md:p-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between gap-4">
                     {step > 1 ? (
-                        <button
-                            type="button"
-                            onClick={prevStep}
-                            className="flex items-center gap-2 py-4 px-6 rounded-[1.2rem] border border-gray-200 text-gray-600 font-bold hover:bg-white transition-all active:scale-95"
-                        >
+                        <button type="button" onClick={() => { setError(null); setStep(step - 1); }} className="flex items-center gap-2 py-4 px-6 rounded-[1.2rem] border border-gray-200 text-gray-600 font-bold hover:bg-white transition-all">
                             <ArrowLeft className="w-5 h-5" />
                             <span className="hidden sm:inline">Précédent</span>
                         </button>
-                    ) : (
-                        <div />
-                    )}
-
+                    ) : <span />}
                     <button
-                        type="button"
-                        onClick={step === totalSteps ? handleSubmit : nextStep}
-                        disabled={loading || !validateStep()}
-                        className="flex-1 max-w-[240px] py-4 px-8 rounded-[1.2rem] bg-[#e6244d] text-white font-bold hover:bg-[#c91d41] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-[#e6244d]/20 active:scale-95 translate-y-0 group"
+                        type="submit"
+                        disabled={saving || uploadingImage}
+                        className="flex-1 max-w-[260px] py-4 px-8 rounded-[1.2rem] bg-[#e6244d] text-white font-bold hover:bg-[#c91d41] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-[#e6244d]/20"
                     >
-                        {loading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        {saving ? <Loader2 className="w-5 h-5 animate-spin" aria-label="Enregistrement" /> : step === TOTAL_STEPS ? (
+                            <><span>{isEditing ? 'Enregistrer' : 'Lancer la mission'}</span><Send className="w-5 h-5" /></>
                         ) : (
-                            <>
-                                {step === totalSteps ? (
-                                    <>
-                                        <span>{isEditing ? 'Enregistrer' : 'Lancer la mission'}</span>
-                                        <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>Continuer</span>
-                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </>
+                            <><span>Continuer</span><ArrowRight className="w-5 h-5" /></>
                         )}
                     </button>
                 </div>
-            </div>
-        </div>
+            </form>
+        </Modal>
     );
 }

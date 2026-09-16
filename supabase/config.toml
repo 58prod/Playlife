@@ -1,0 +1,6 @@
+# Configuration Supabase CLI (utilisée pour le déploiement des fonctions)
+project_id = "rqrkorimpcobmbbsdcgz"
+
+[functions.notify-new-mission]
+# Le JWT est vérifié dans le code de la fonction (compatible clés de signature asymétriques)
+verify_jwt = false

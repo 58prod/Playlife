@@ -1,95 +1,109 @@
-# Playlife — Plateforme de missions solidaires
+# Playlife Connect
 
-Application web permettant à des voyageurs solidaires et des animateurs/enseignants d'organiser des missions de don de matériel sportif à destination d'enfants, via des structures locales partenaires.
+Plateforme de missions solidaires : des voyageurs et des animateurs/enseignants organisent la remise de packs de matériel sportif à des enfants, via des structures locales partenaires.
 
----
+## Stack
 
-## 🚀 Stack technique
-
-- **Frontend** : React 18 + TypeScript + Vite
-- **Styling** : Tailwind CSS 4.0
-- **Routing** : React Router DOM v7
-- **Backend / BDD** : Supabase (PostgreSQL, Auth, Storage)
-- **Icônes** : Lucide React
-- **Déploiement** : Netlify
-
----
-
-## 📄 Pages
-
-| Route | Description |
+| Rôle | Outil |
 |---|---|
-| `/` | Page d'accueil avec diaporama et présentation |
-| `/missions` | Liste des missions + formulaire de création |
-| `/structures` | Structures locales partenaires validées |
-| `/impact` | Parcours Playlife et impact social |
-| `/ressources` | Boîte à outils pour les utilisateurs |
-| `/contact` | Informations de contact |
-| `/dashboard` | Tableau de bord personnel *(authentifié)* |
-| `/settings` | Administration *(super admin uniquement)* |
+| Interface | React 19, TypeScript, Vite 8, Tailwind CSS 4 |
+| Navigation | React Router 7 (pages chargées à la demande) |
+| Backend | Supabase (PostgreSQL + RLS, Auth, Storage, Edge Functions) |
+| Hébergement | Netlify |
 
----
+## Démarrer en local
 
-## ⚙️ Installation
-
-### Prérequis
-
-- Node.js ≥ 18
-- Un projet [Supabase](https://supabase.com) configuré
-
-### 1. Cloner le projet et installer les dépendances
+Prérequis : Node.js 20 ou plus.
 
 ```bash
 npm install
-```
-
-### 2. Configurer les variables d'environnement
-
-Copiez `.env.example` en `.env` et renseignez vos clés Supabase :
-
-```env
-VITE_SUPABASE_URL=https://votre-projet.supabase.co
-VITE_SUPABASE_ANON_KEY=votre-cle-anon-publique
-```
-
-### 3. Initialiser la base de données
-
-Dans le SQL Editor de votre projet Supabase, exécutez dans l'ordre :
-
-1. `supabase/MIGRATION_COMPLETE_SECURISEE.sql` — tables, RLS, vues, buckets Storage
-2. `supabase/set_super_admin.sql` — promouvoir un compte en super admin (modifier l'email)
-3. `supabase/verification_securite.sql` — vérifier que tout est correctement configuré
-
-### 4. Lancer le serveur de développement
-
-```bash
+cp .env.example .env   # puis renseigner l'URL et la clé publique Supabase
 npm run dev
 ```
 
----
+| Commande | Effet |
+|---|---|
+| `npm run dev` | Serveur de développement (http://localhost:5173) |
+| `npm run build` | Vérification TypeScript + build de production dans `dist/` |
+| `npm run typecheck` | Vérification TypeScript seule |
+| `npm run preview` | Sert le build de production en local |
 
-## 🛡️ Sécurité
+## Pages
 
-- Row Level Security (RLS) activé sur toutes les tables
-- Les utilisateurs n'accèdent qu'à leurs propres données
-- Aucune clé sensible dans le code — tout passe par `.env`
-- Vue `public_profiles` sans données sensibles (email, is_super_admin)
+| Route | Accès | Contenu |
+|---|---|---|
+| `/` | public | Accueil, diaporama, chiffres clés |
+| `/missions` | public | Missions publiées (en cours / terminées) |
+| `/structures` | public | Structures partenaires validées |
+| `/impact` | public | Parcours Playlife |
+| `/ressources` | public | Guides PDF |
+| `/contact` | public | Coordonnées |
+| `/login`, `/register` | public | Connexion, inscription |
+| `/mot-de-passe-oublie`, `/nouveau-mot-de-passe` | public | Réinitialisation du mot de passe |
+| `/dashboard` | connecté | Profil, mes missions, photos |
+| `/settings` | super admin | Modération missions et structures, chiffres clés, diaporama |
 
----
+## Organisation du code
 
-## 🚢 Déploiement
-
-```bash
-npm run build
-netlify deploy --prod --dir=dist --site=playlife
+```
+src/
+  app/
+    App.tsx            routes et mise en page
+    components/        composants partagés (formulaires, modales, navigation…)
+    pages/             une page par route ; pages/settings/ = sections d'administration
+  contexts/            AuthContext (session + profil)
+  hooks/               lecture de site_config (chiffres clés, diaporama)
+  lib/                 client Supabase, formatage, erreurs, Storage, missions
+  types/               types de la base de données
+supabase/
+  MIGRATION_COMPLETE_SECURISEE.sql   schéma initial (nouvelle instance)
+  migrations/                        migrations à appliquer ensuite, dans l'ordre
+  functions/notify-new-mission/      email à l'équipe quand une mission est créée
+  set_super_admin.sql                promouvoir un compte administrateur
+  archive/                           anciens scripts, conservés pour l'historique
 ```
 
-Pour plus de détails, voir `supabase/README.md` et `DEPLOIEMENT_NOUVELLE_INSTANCE.md`.
+## Règles métier
 
----
+- **Missions** : une mission créée est **invisible** jusqu'à sa publication par un super admin (`/settings`). Le créateur la voit dans son tableau de bord avec le badge « En attente de validation ».
+- **Structures** : une structure proposée a le statut « à valider playlife » ; seules les structures « validée » sont publiques.
+- Ces règles sont **garanties côté base** (triggers + RLS), pas seulement dans l'interface.
 
-## 👤 Profils utilisateurs
+## Base de données
 
-- **Voyageur solidaire** : profite d'un voyage pour remettre un pack sportif à une structure locale
-- **Animateur / Enseignant** : encadre des enfants dans la création d'un pack destiné à d'autres enfants
-- **Super admin** : accès à la page Paramètres pour gérer structures, missions et diaporama
+### Nouvelle instance
+
+Dans le SQL Editor Supabase, exécuter dans l'ordre :
+
+1. `supabase/MIGRATION_COMPLETE_SECURISEE.sql`
+2. chaque fichier de `supabase/migrations/` (ordre alphabétique)
+3. `supabase/set_super_admin.sql` après avoir créé votre compte (remplacer l'email)
+
+### Instance existante
+
+Exécuter uniquement les fichiers de `supabase/migrations/` qui n'ont pas encore été appliqués. Ils sont idempotents (ré-exécutables sans risque).
+
+### Réglages Supabase à vérifier
+
+- **Authentication → URL Configuration** : *Site URL* = l'adresse du site en production, et ajouter `https://<site>/**` et `http://localhost:5173/**` dans *Redirect URLs* (liens de confirmation d'email et de réinitialisation du mot de passe).
+- **Authentication → Emails** : personnaliser les modèles d'email en français.
+
+## Fonction de notification (optionnelle)
+
+Envoie un email à l'équipe via [Resend](https://resend.com) à chaque nouvelle mission.
+
+```bash
+npx supabase login
+npx supabase secrets set RESEND_API_KEY=... SITE_URL=https://<site> --project-ref rqrkorimpcobmbbsdcgz
+npx supabase functions deploy notify-new-mission --no-verify-jwt --project-ref rqrkorimpcobmbbsdcgz
+```
+
+Secrets optionnels : `NOTIFY_TO_EMAIL` (défaut `missions@playlife.today`), `NOTIFY_FROM_EMAIL` (domaine vérifié dans Resend).
+
+## Déploiement Netlify
+
+`netlify.toml` contient déjà la commande de build, la redirection des routes et les en-têtes de sécurité.
+
+1. Créer le site (depuis le dépôt GitHub, ou `netlify init`).
+2. Ajouter les variables d'environnement `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`.
+3. Déployer, puis reporter l'adresse du site dans la configuration Auth de Supabase (voir plus haut).

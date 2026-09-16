@@ -1,8 +1,8 @@
-import { Package, Plane, GraduationCap, Target, DollarSign, Heart, CheckCircle, Users, FileText, TrendingUp, ArrowRight } from 'lucide-react';
+import { Package, Plane, GraduationCap, DollarSign, Heart, CheckCircle, Users, TrendingUp } from 'lucide-react';
 
 export default function Impact() {
     return (
-        <div className="px-4 md:px-8 py-4 md:py-6 border-t border-gray-100">
+        <div className="px-4 md:px-8 py-4 md:py-6">
             {/* Header */}
             <div className="mb-8 md:mb-12">
                 <h1 className="text-3xl md:text-5xl font-bold text-[#22081c] leading-tight mb-3 md:mb-4">
