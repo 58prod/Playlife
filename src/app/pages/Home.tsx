@@ -21,7 +21,7 @@ const DEFAULT_PHOTOS = [photo1, photo2, photo3];
 
 const STEPS = [
   { icon: Target, title: 'Créer la mission', text: 'Définissez le lieu, la structure et vos dates.' },
-  { icon: HandCoins, title: 'Lancer la collecte', text: 'Une cagnotte liée à Playlife, avec reçu fiscal.' },
+  { icon: HandCoins, title: 'Lancer la collecte', text: 'Une cagnotte liée à Playlife, reçus fiscaux automatiques.' },
   { icon: Package, title: 'Préparer le pack', text: 'Ballons, chasubles, plots et kit de gonflage.' },
   { icon: Send, title: 'Remettre le pack', text: 'En main propre ou via une structure partenaire.' },
   { icon: Camera, title: 'Partager l\'impact', text: 'Photos et souvenirs pour inspirer d\'autres missions.' },

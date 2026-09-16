@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { Building2, Heart, User } from 'lucide-react';
+import { Building2, Heart, Receipt, User } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { donationSimulation, formatEuro, PACK, PACK_COST, TAX_RATE, type DonorType } from '@/lib/playlife';
 
@@ -89,7 +89,7 @@ export function DonationSimulator({ className }: { className?: string }) {
 
                     <div className="mt-5 flex h-3 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
                         <div className="bg-brand-500 transition-all duration-300" style={{ width: `${100 - TAX_RATE[donor] * 100}%` }} />
-                        <div className="bg-ink-300 transition-all duration-300" style={{ width: `${TAX_RATE[donor] * 100}%` }} />
+                        <div className="bg-ink-900 transition-all duration-300" style={{ width: `${TAX_RATE[donor] * 100}%` }} />
                     </div>
                     <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
                         <div>
@@ -97,7 +97,7 @@ export function DonationSimulator({ className }: { className?: string }) {
                             <dd className="font-semibold tabular-nums text-ink-900">{formatEuro(sim.realCost)}</dd>
                         </div>
                         <div>
-                            <dt className="flex items-center gap-1.5 text-gray-600"><span className="size-2 rounded-full bg-ink-300" aria-hidden="true" />Réduction d'impôt</dt>
+                            <dt className="flex items-center gap-1.5 text-gray-600"><span className="size-2 rounded-full bg-ink-900" aria-hidden="true" />Réduction d'impôt</dt>
                             <dd className="font-semibold tabular-nums text-ink-900">{formatEuro(sim.reduction)}</dd>
                         </div>
                     </dl>
@@ -118,7 +118,11 @@ export function DonationSimulator({ className }: { className?: string }) {
                 </div>
             </div>
 
-            <p className="mt-6 text-xs text-gray-500">
+            <p className="mt-6 flex items-start gap-2 rounded-xl bg-surface-100 p-3 text-sm text-ink-800">
+                <Receipt className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
+                <span>Votre <strong>reçu fiscal</strong> est envoyé <strong>automatiquement</strong> par la plateforme partenaire (Leetchi) : aucune démarche à faire.</span>
+            </p>
+            <p className="mt-3 text-xs text-gray-500">
                 Simulation indicative. {donor === 'particulier'
                     ? 'Réduction de 66 % dans la limite de 20 % du revenu imposable ; l\'excédent est reportable sur 5 ans.'
                     : 'Réduction de 60 % dans la limite de 20 000 € ou 0,5 % du chiffre d\'affaires HT (le montant le plus élevé).'} Un pack coûte environ {formatEuro(PACK_COST)}.
@@ -145,6 +149,7 @@ export function DonationSimulatorCompact({ className }: { className?: string }) 
             <p className="mt-3 text-sm text-gray-600" aria-live="polite">
                 Un don de {formatEuro(sim.amount)} ne vous coûte que <strong className="text-brand-600">{formatEuro(sim.realCost)}</strong> après réduction d'impôt.
             </p>
+            <p className="mt-2 text-xs text-gray-500">Reçu fiscal envoyé automatiquement par Leetchi.</p>
         </div>
     );
 }

@@ -157,7 +157,7 @@ export default function CommentCaMarche() {
                                         </li>
                                     ))}
                                 </ul>
-                                <p className="mt-6 text-xs text-gray-500">Les reçus fiscaux sont émis dans le respect du cadre réglementaire.</p>
+                                <p className="mt-6 text-sm text-gray-600">Les <strong className="text-ink-900">reçus fiscaux sont émis automatiquement</strong> par la plateforme partenaire (Leetchi), dans le respect du cadre réglementaire : ni le porteur de mission ni le donateur n'ont de démarche à faire.</p>
                             </div>
                         </div>
                     </div>

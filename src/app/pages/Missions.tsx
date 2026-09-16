@@ -123,7 +123,7 @@ export default function Missions() {
                 <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
                     <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500"><Receipt className="size-5" aria-hidden="true" /></span>
                     <h3 className="mt-4 font-semibold">Mettez en avant l'avantage fiscal</h3>
-                    <p className="mt-2 text-sm text-gray-600">Via <a href="https://www.leetchi.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500">Leetchi</a>, chaque don ouvre droit à un reçu fiscal : <strong className="text-ink-900">66 % de réduction d'impôt</strong> pour les particuliers, 60 % pour les entreprises.</p>
+                    <p className="mt-2 text-sm text-gray-600">Via <a href="https://www.leetchi.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500">Leetchi</a>, chaque donateur reçoit <strong className="text-ink-900">automatiquement son reçu fiscal</strong> : <strong className="text-ink-900">66 % de réduction d'impôt</strong> pour les particuliers, 60 % pour les entreprises.</p>
                 </div>
             </section>
 
