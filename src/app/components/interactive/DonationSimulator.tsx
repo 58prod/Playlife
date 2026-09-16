@@ -89,7 +89,7 @@ export function DonationSimulator({ className }: { className?: string }) {
 
                     <div className="mt-5 flex h-3 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
                         <div className="bg-brand-500 transition-all duration-300" style={{ width: `${100 - TAX_RATE[donor] * 100}%` }} />
-                        <div className="bg-emerald-400 transition-all duration-300" style={{ width: `${TAX_RATE[donor] * 100}%` }} />
+                        <div className="bg-ink-300 transition-all duration-300" style={{ width: `${TAX_RATE[donor] * 100}%` }} />
                     </div>
                     <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
                         <div>
@@ -97,7 +97,7 @@ export function DonationSimulator({ className }: { className?: string }) {
                             <dd className="font-semibold tabular-nums text-ink-900">{formatEuro(sim.realCost)}</dd>
                         </div>
                         <div>
-                            <dt className="flex items-center gap-1.5 text-gray-600"><span className="size-2 rounded-full bg-emerald-400" aria-hidden="true" />Réduction d'impôt</dt>
+                            <dt className="flex items-center gap-1.5 text-gray-600"><span className="size-2 rounded-full bg-ink-300" aria-hidden="true" />Réduction d'impôt</dt>
                             <dd className="font-semibold tabular-nums text-ink-900">{formatEuro(sim.reduction)}</dd>
                         </div>
                     </dl>
