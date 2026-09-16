@@ -13,6 +13,7 @@ import photo3 from '@/assets/accueil-3.jpg';
 import heart from '@/assets/coeur-playlife.png';
 import { MissionCard } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
+import { MissionQuiz } from '../components/interactive/MissionQuiz';
 import { Button, ButtonLink } from '../components/ui/Button';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 
@@ -185,6 +186,11 @@ export default function Home() {
             </article>
           ))}
         </div>
+      </section>
+
+      {/* Quiz d'orientation */}
+      <section className="container-page pb-16 lg:pb-24" aria-label="Quiz : quelle mission est faite pour vous ?">
+        <MissionQuiz onStartMission={startMission} />
       </section>
 
       {/* Comment ça marche */}

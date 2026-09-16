@@ -8,6 +8,7 @@ import { errorMessage } from '@/lib/errors';
 import { cn } from '@/lib/cn';
 import { avatarSrc, formatDateRange, missionLocation, pluralize, profileUserType, USER_TYPE_LABELS } from '@/lib/format';
 import { deleteMission, deleteMissionPhoto, fetchPhotosByMission } from '@/lib/missions';
+import { PACK } from '@/lib/playlife';
 import { removePublicFile, uploadPublicFile, validateUpload } from '@/lib/storage';
 import type { Mission, MissionMedia, UserType } from '@/types/database.types';
 import { useConfirm } from '../components/ConfirmDialog';
@@ -23,8 +24,6 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Field, Input, Select } from '../components/ui/Field';
 import { Skeleton } from '../components/ui/Skeleton';
 
-/** Estimation affichée dans le tableau de bord : nombre moyen d'enfants par pack remis. */
-const CHILDREN_PER_PACK = 20;
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -110,7 +109,7 @@ export default function Dashboard() {
         { label: 'Missions', value: missions.length },
         { label: 'En cours', value: active.length },
         { label: 'Terminées', value: completed.length },
-        { label: 'Enfants aidés (estim.)', value: completed.length * CHILDREN_PER_PACK },
+        { label: 'Enfants aidés (estim.)', value: completed.length * PACK.childrenPerPack },
     ];
 
     const renderMissionCard = (mission: Mission) => {

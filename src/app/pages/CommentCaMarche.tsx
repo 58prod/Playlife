@@ -1,5 +1,9 @@
 import { useState, type ReactNode } from 'react';
-import { ArrowRight, Check, GraduationCap, Plane, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, Check, GraduationCap, Plane, ShieldCheck, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { formatEuro, PACK, PACK_COST } from '@/lib/playlife';
+import { DonationSimulator } from '../components/interactive/DonationSimulator';
+import { FundraisingCalculator } from '../components/interactive/FundraisingCalculator';
 import heart from '@/assets/coeur-playlife.png';
 import { ButtonLink } from '../components/ui/Button';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -42,7 +46,7 @@ const JOURNEYS: Record<'voyageur' | 'animateur', { icon: typeof Plane; title: st
     },
 };
 
-const PACK = [
+const PACK_CONTENT = [
     { value: '8 à 12', label: 'ballons', text: 'Football, basketball, volleyball… selon les besoins locaux.' },
     { value: 'Chasubles', label: '& plots', text: 'Pour organiser des équipes et structurer les ateliers.' },
     { value: 'Kit', label: 'd\'entretien', text: 'Pompes et aiguilles pour l\'autonomie et la durabilité du matériel.' },
@@ -59,6 +63,7 @@ function SectionTitle({ eyebrow, title, children }: { eyebrow: string; title: st
 }
 
 export default function CommentCaMarche() {
+    const { user } = useAuth();
     const [journey, setJourney] = useState<'voyageur' | 'animateur'>('voyageur');
     const current = JOURNEYS[journey];
 
@@ -76,12 +81,12 @@ export default function CommentCaMarche() {
                         <h2 id="pack-title" className="mt-3 text-3xl font-bold text-white md:text-4xl">Qu'est-ce qu'un pack Playlife ?</h2>
                         <p className="mt-4 text-ink-200">Du matériel sportif simple, durable et immédiatement utilisable pour permettre à des enfants de jouer, s'entraîner et partager des moments collectifs.</p>
                         <div className="mt-8 inline-flex items-center gap-4 rounded-2xl bg-white/10 p-4">
-                            <span className="whitespace-nowrap font-display text-3xl font-bold">≈ 300 €</span>
-                            <span className="text-sm text-ink-200">250 € de matériel<br />+ 50 € de livraison ou bagage</span>
+                            <span className="whitespace-nowrap font-display text-3xl font-bold">≈ {formatEuro(PACK_COST)}</span>
+                            <span className="text-sm text-ink-200">{formatEuro(PACK.equipment)} de matériel<br />+ {formatEuro(PACK.delivery)} de livraison ou bagage</span>
                         </div>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-                        {PACK.map(item => (
+                        {PACK_CONTENT.map(item => (
                             <div key={item.value} className="rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10">
                                 <p className="font-display text-2xl font-bold">{item.value} <span className="text-brand-300">{item.label}</span></p>
                                 <p className="mt-1 text-sm text-ink-200">{item.text}</p>
@@ -129,29 +134,32 @@ export default function CommentCaMarche() {
             </section>
 
             {/* Cagnotte & fiscalité */}
-            <section className="bg-white py-20 lg:py-28" aria-label="Cagnotte et fiscalité">
-                <div className="container-page grid gap-6 lg:grid-cols-2">
+            <section className="bg-white py-20 lg:py-28" aria-labelledby="money-title">
+                <div className="container-page space-y-6">
+                    <SectionTitle eyebrow="Financer sa mission" title="La cagnotte, simplement">
+                        Playlife dispose d'un rescrit fiscal : chaque don ouvre droit à une réduction d'impôt. De quoi convaincre facilement vos proches.
+                    </SectionTitle>
+                    <h2 id="money-title" className="sr-only">Cagnotte et réduction d'impôt</h2>
+
+                    <DonationSimulator className="mt-4" />
+                    <FundraisingCalculator action={<ButtonLink to={user ? '/missions?create=true' : '/login?create=true'} iconRight={ArrowRight}>Créer ma mission</ButtonLink>} />
+
                     <div className="rounded-3xl bg-surface-100 p-8 md:p-10">
-                        <span className="flex size-12 items-center justify-center rounded-xl bg-white text-ink-900 shadow-soft"><ShieldCheck className="size-6" aria-hidden="true" /></span>
-                        <h2 className="mt-6 text-2xl font-bold md:text-3xl">Une cagnotte simple, un impact transparent</h2>
-                        <p className="mt-3 text-gray-600">Chaque porteur de mission crée sa cagnotte sur {LEETCHI}. Le lien est intégré dans Playlife Connect pour garantir :</p>
-                        <ul className="mt-6 space-y-3">
-                            {['La traçabilité des dons', 'La cohérence avec la mission', 'L\'utilisation conforme des fonds'].map(item => (
-                                <li key={item} className="flex items-center gap-3 font-medium text-ink-900">
-                                    <span className="flex size-6 items-center justify-center rounded-full bg-brand-500 text-white"><Check className="size-3.5" aria-hidden="true" /></span>{item}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="rounded-3xl bg-surface-100 p-8 md:p-10">
-                        <span className="flex size-12 items-center justify-center rounded-xl bg-white text-ink-900 shadow-soft"><Sparkles className="size-6" aria-hidden="true" /></span>
-                        <h2 className="mt-6 text-2xl font-bold md:text-3xl">Des dons déductibles des impôts</h2>
-                        <p className="mt-3 text-gray-600">Playlife dispose d'un rescrit fiscal. Les donateurs bénéficient d'une <strong className="text-ink-900">réduction d'impôt de 66 %</strong> (60 % pour les entreprises), dans la limite de 20 % du revenu imposable.</p>
-                        <div className="mt-6 flex items-center gap-5 rounded-2xl bg-white p-5 shadow-soft">
-                            <p className="font-display text-4xl font-bold text-brand-500">34 €</p>
-                            <p className="text-sm text-gray-600">C'est le coût réel d'un don de <strong className="text-ink-900">100 €</strong> après réduction d'impôt.</p>
+                        <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start">
+                            <span className="flex size-12 items-center justify-center rounded-xl bg-white text-ink-900 shadow-soft"><ShieldCheck className="size-6" aria-hidden="true" /></span>
+                            <div>
+                                <h3 className="text-2xl font-bold">Un impact transparent</h3>
+                                <p className="mt-3 text-gray-600">Chaque porteur de mission crée sa cagnotte sur {LEETCHI}. Le lien est intégré dans Playlife Connect pour garantir :</p>
+                                <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+                                    {['La traçabilité des dons', 'La cohérence avec la mission', 'L\'utilisation conforme des fonds'].map(item => (
+                                        <li key={item} className="flex items-center gap-3 font-medium text-ink-900">
+                                            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white"><Check className="size-3.5" aria-hidden="true" /></span>{item}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="mt-6 text-xs text-gray-500">Les reçus fiscaux sont émis dans le respect du cadre réglementaire.</p>
+                            </div>
                         </div>
-                        <p className="mt-4 text-xs text-gray-500">Les reçus fiscaux sont émis dans le respect du cadre réglementaire.</p>
                     </div>
                 </div>
             </section>

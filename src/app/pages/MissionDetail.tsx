@@ -9,6 +9,7 @@ import { fetchPhotosByMission } from '@/lib/missions';
 import type { Mission, MissionMedia } from '@/types/database.types';
 import { MissionCover } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
+import { DonationSimulatorCompact } from '../components/interactive/DonationSimulator';
 import { PhotoSlideshowModal } from '../components/PhotoSlideshowModal';
 import { Badge } from '../components/ui/Badge';
 import { Button, ButtonLink } from '../components/ui/Button';
@@ -137,7 +138,7 @@ export default function MissionDetail() {
                                     <a href={mission.fundraising_url} target="_blank" rel="noopener noreferrer" className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-500 font-semibold text-white shadow-brand transition hover:bg-brand-600">
                                         <Heart className="size-4 fill-current" aria-hidden="true" /> Soutenir cette mission <ExternalLink className="size-4 opacity-70" aria-hidden="true" />
                                     </a>
-                                    <p className="text-center text-xs text-gray-500">Don déductible à 66 % de vos impôts</p>
+                                    <DonationSimulatorCompact />
                                 </>
                             )}
                             <Button variant="secondary" icon={Share2} onClick={share} className="w-full">Partager la mission</Button>
