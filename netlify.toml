@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Ancienne adresse de la page « Comment ça marche »
+[[redirects]]
+  from = "/impact"
+  to = "/comment-ca-marche"
+  status = 301
+
 # Application monopage : toutes les routes servent index.html
 [[redirects]]
   from = "/*"

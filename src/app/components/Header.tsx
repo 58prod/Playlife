@@ -10,7 +10,7 @@ import { UserMenu } from './UserMenu';
 export const NAV_ITEMS = [
   { label: 'Missions', path: '/missions' },
   { label: 'Structures', path: '/structures' },
-  { label: 'Le parcours', path: '/impact' },
+  { label: 'Comment ça marche', path: '/comment-ca-marche' },
   { label: 'Ressources', path: '/ressources' },
   { label: 'Contact', path: '/contact' },
 ];
@@ -45,20 +45,20 @@ export function Header() {
 
   return (
     <header className={cn('sticky top-0 z-40 transition-all duration-300', scrolled || mobileOpen ? 'bg-surface-50/85 shadow-[0_1px_0_rgb(48_21_54/0.08)] backdrop-blur-xl' : 'bg-transparent')}>
-      <div className="container-page flex h-16 items-center gap-6 lg:h-20">
+      <div className="container-page flex h-16 items-center gap-4 lg:h-20 xl:gap-6">
         <Link to="/" className="shrink-0" aria-label="Playlife Connect — accueil">
           <img src={logo} alt="Playlife Connect" className="h-9 w-auto lg:h-10" width={800} height={229} />
         </Link>
 
         <nav aria-label="Navigation principale" className="hidden flex-1 justify-center lg:flex">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-0.5 xl:gap-1">
             {NAV_ITEMS.map(item => (
               <li key={item.path}>
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => cn(
-                    'relative rounded-full px-4 py-2 text-sm font-medium transition',
-                    isActive ? 'text-ink-900 after:absolute after:inset-x-4 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-brand-500' : 'text-gray-600 hover:text-ink-900 hover:bg-ink-900/[0.04]',
+                    'relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition xl:px-4',
+                    isActive ? 'text-ink-900 after:absolute after:inset-x-3 xl:after:inset-x-4 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-brand-500' : 'text-gray-600 hover:text-ink-900 hover:bg-ink-900/[0.04]',
                   )}
                 >
                   {item.label}

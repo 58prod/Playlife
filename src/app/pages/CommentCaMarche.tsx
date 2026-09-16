@@ -58,14 +58,14 @@ function SectionTitle({ eyebrow, title, children }: { eyebrow: string; title: st
     );
 }
 
-export default function Impact() {
+export default function CommentCaMarche() {
     const [journey, setJourney] = useState<'voyageur' | 'animateur'>('voyageur');
     const current = JOURNEYS[journey];
 
     return (
         <div className="pt-8 lg:pt-14">
             <div className="container-page">
-                <PageHeader eyebrow="Le parcours" title="Comment fonctionne Playlife Connect" description="Une plateforme pour mener une action concrète pour les enfants du monde entier : simplement, concrètement, ensemble." />
+                <PageHeader eyebrow="Comment ça marche" title="Agir avec Playlife Connect" description="Une plateforme pour mener une action concrète pour les enfants du monde entier : simplement, concrètement, ensemble." />
             </div>
 
             {/* Le pack */}
@@ -76,7 +76,7 @@ export default function Impact() {
                         <h2 id="pack-title" className="mt-3 text-3xl font-bold text-white md:text-4xl">Qu'est-ce qu'un pack Playlife ?</h2>
                         <p className="mt-4 text-ink-200">Du matériel sportif simple, durable et immédiatement utilisable pour permettre à des enfants de jouer, s'entraîner et partager des moments collectifs.</p>
                         <div className="mt-8 inline-flex items-center gap-4 rounded-2xl bg-white/10 p-4">
-                            <span className="font-display text-3xl font-bold">≈ 300 €</span>
+                            <span className="whitespace-nowrap font-display text-3xl font-bold">≈ 300 €</span>
                             <span className="text-sm text-ink-200">250 € de matériel<br />+ 50 € de livraison ou bagage</span>
                         </div>
                     </div>

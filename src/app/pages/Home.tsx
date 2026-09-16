@@ -195,7 +195,7 @@ export default function Home() {
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Comment ça marche</p>
               <h2 id="steps-title" className="mt-3 text-3xl font-bold md:text-4xl">Cinq étapes, accompagnées par Playlife</h2>
             </div>
-            <ButtonLink to="/impact" variant="ghost" iconRight={ArrowRight} className="self-start md:self-auto">Découvrir le parcours</ButtonLink>
+            <ButtonLink to="/comment-ca-marche" variant="ghost" iconRight={ArrowRight} className="self-start md:self-auto">En savoir plus</ButtonLink>
           </div>
           <ol className="relative mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
             <div className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-gradient-to-r from-brand-200 via-ink-200 to-brand-200 lg:block" aria-hidden="true" />

@@ -35,7 +35,7 @@ npm run dev
 | `/` | public | Accueil, diaporama, chiffres clés |
 | `/missions` | public | Missions publiées (en cours / terminées) |
 | `/structures` | public | Structures partenaires validées |
-| `/impact` | public | Parcours Playlife |
+| `/comment-ca-marche` | public | Le pack, le parcours en 7 étapes, la cagnotte (`/impact` redirige ici) |
 | `/ressources` | public | Guides PDF |
 | `/contact` | public | Coordonnées |
 | `/login`, `/register` | public | Connexion, inscription |

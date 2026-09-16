@@ -12,7 +12,7 @@ import Home from './pages/Home';
 const Missions = lazy(() => import('./pages/Missions'));
 const MissionDetail = lazy(() => import('./pages/MissionDetail'));
 const Structures = lazy(() => import('./pages/Structures'));
-const Impact = lazy(() => import('./pages/Impact'));
+const CommentCaMarche = lazy(() => import('./pages/CommentCaMarche'));
 const Ressources = lazy(() => import('./pages/Ressources'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Login = lazy(() => import('./pages/Login'));
@@ -44,7 +44,8 @@ function AppContent() {
             <Route path="/missions" element={<Missions />} />
             <Route path="/missions/:id" element={<MissionDetail />} />
             <Route path="/structures" element={<Structures />} />
-            <Route path="/impact" element={<Impact />} />
+            <Route path="/comment-ca-marche" element={<CommentCaMarche />} />
+            <Route path="/impact" element={<Navigate to="/comment-ca-marche" replace />} />
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
