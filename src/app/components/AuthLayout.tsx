@@ -1,68 +1,60 @@
 import type { ComponentType, InputHTMLAttributes, ReactNode } from 'react';
-import { Loader2 } from 'lucide-react';
+import photo from '@/assets/connexion.jpg';
+import heart from '@/assets/coeur-playlife.png';
+import { Button } from './ui/Button';
+import { Field, Input } from './ui/Field';
 
 interface AuthLayoutProps {
-    icon: ComponentType<{ className?: string }>;
+    icon?: ComponentType<{ className?: string }>;
     title: string;
-    subtitle?: string;
+    subtitle?: ReactNode;
     error?: string | null;
     children: ReactNode;
 }
 
-export function AuthLayout({ icon: Icon, title, subtitle, error, children }: AuthLayoutProps) {
+export function AuthLayout({ title, subtitle, error, children }: AuthLayoutProps) {
     return (
-        <div className="min-h-[calc(100vh-95px)] flex items-start justify-center bg-gray-50 px-4 md:px-8 py-6 md:py-10">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100">
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-[#e6244d] rounded-2xl mb-4 shadow-lg shadow-[#e6244d]/20">
-                        <Icon className="w-8 h-8 text-white" />
-                    </div>
-                    <h1 className="text-2xl font-bold text-[#22081c]">{title}</h1>
-                    {subtitle && <p className="text-gray-500 mt-2">{subtitle}</p>}
+        <div className="container-page grid min-h-[calc(100dvh-5rem)] gap-10 py-8 lg:grid-cols-2 lg:gap-16 lg:py-10">
+            <div className="flex items-center justify-center">
+                <div className="w-full max-w-md animate-fade-up">
+                    <h1 className="text-3xl font-bold md:text-4xl">{title}</h1>
+                    {subtitle && <p className="mt-3 text-gray-600">{subtitle}</p>}
+                    {error && (
+                        <div className="mt-6 rounded-xl bg-red-50 p-4 text-sm text-red-700 ring-1 ring-red-100" role="alert">{error}</div>
+                    )}
+                    <div className="mt-8">{children}</div>
                 </div>
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl" role="alert">
-                        {error}
-                    </div>
-                )}
-                {children}
             </div>
+            <aside className="relative hidden overflow-hidden rounded-[2rem] bg-ink-900 lg:block" aria-hidden="true">
+                <img src={photo} alt="" className="absolute inset-0 size-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-950/95 via-ink-950/40 to-transparent" />
+                <div className="relative flex h-full flex-col justify-between p-10 text-white">
+                    <img src={heart} alt="" className="w-20" />
+                    <div>
+                        <p className="font-display text-4xl font-bold leading-tight text-white">« Un ballon, et c'est tout un terrain de jeu qui s'ouvre. »</p>
+                        <p className="mt-4 max-w-sm text-ink-200">Rejoignez les voyageurs et les éducateurs qui font rayonner le sport auprès des enfants, partout dans le monde.</p>
+                    </div>
+                </div>
+            </aside>
         </div>
     );
 }
 
 interface AuthFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     id: string;
-    label: string;
+    label: ReactNode;
     icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
     hint?: string;
 }
 
-export function AuthField({ id, label, icon: Icon, hint, ...input }: AuthFieldProps) {
+export function AuthField({ id, label, icon, hint, ...input }: AuthFieldProps) {
     return (
-        <div>
-            <label htmlFor={id} className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
-            <div className="relative">
-                <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden />
-                <input
-                    id={id}
-                    {...input}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e6244d]/20 focus:border-[#e6244d] transition-all"
-                />
-            </div>
-            {hint && <p className="mt-1.5 text-xs text-gray-400">{hint}</p>}
-        </div>
+        <Field id={id} label={label} hint={hint}>
+            <Input id={id} icon={icon} className="h-12" {...input} />
+        </Field>
     );
 }
 
 export function SubmitButton({ loading, children }: { loading: boolean; children: ReactNode }) {
-    return (
-        <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-[#e6244d] text-white font-bold rounded-xl hover:bg-[#c91d41] transition-all shadow-lg shadow-[#e6244d]/20 flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-label="Chargement" /> : children}
-        </button>
-    );
+    return <Button type="submit" size="lg" loading={loading} className="w-full">{children}</Button>;
 }

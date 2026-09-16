@@ -1,11 +1,13 @@
-import { useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
-import { Building2, FileText, Link as LinkIcon, Loader2, Mail, MapPin, Phone, Tag, User, X } from 'lucide-react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { Building2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { errorMessage } from '@/lib/errors';
 import { COUNTRIES, STRUCTURE_TYPES } from '@/lib/countries';
 import { Modal } from './Modal';
+import { Button } from './ui/Button';
+import { Field, Input, Select, Textarea } from './ui/Field';
 
 interface StructureFormProps {
     onClose: () => void;
@@ -17,39 +19,24 @@ const EMPTY_FORM = {
     contact_phone: '', contact_email: '', origin_info: '', description: '', website_url: '',
 };
 
-const inputClass = 'w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e6244d] focus:border-transparent';
-
-function Field({ id, label, icon: Icon, required, className = '', children }: { id: string; label: string; icon?: typeof Building2; required?: boolean; className?: string; children: ReactNode }) {
-    return (
-        <div className={className}>
-            <label htmlFor={id} className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
-                {Icon && <Icon className="w-4 h-4 text-[#e6244d]" aria-hidden="true" />}
-                {label}{required && <span className="text-[#e6244d]" aria-hidden="true">*</span>}
-            </label>
-            {children}
-        </div>
-    );
-}
-
 export function StructureForm({ onClose, onSuccess }: StructureFormProps) {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState(EMPTY_FORM);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const bind = (name: keyof typeof EMPTY_FORM) => ({
+        id: `structure-${name}`,
+        name,
+        value: form[name],
+        onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(prev => ({ ...prev, [name]: e.target.value })),
+    });
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!user) return;
         setLoading(true);
         const clean = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v.trim() || null])) as Record<keyof typeof EMPTY_FORM, string | null>;
-        const { error } = await supabase.from('structures').insert({
-            ...clean,
-            name: form.name.trim(),
-            status: 'à valider playlife',
-            created_by: user.id,
-        });
+        const { error } = await supabase.from('structures').insert({ ...clean, name: form.name.trim(), status: 'à valider playlife', created_by: user.id });
         setLoading(false);
         if (error) {
             toast.error(`Envoi impossible : ${errorMessage(error)}`);
@@ -62,88 +49,70 @@ export function StructureForm({ onClose, onSuccess }: StructureFormProps) {
 
     return (
         <Modal onClose={onClose} label="Proposer une structure" className="w-full max-w-2xl">
-            <form onSubmit={handleSubmit} className="bg-white w-full rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-6 flex items-center justify-between bg-gradient-to-r from-[#22081c] to-[#3d1232] text-white">
+            <form onSubmit={handleSubmit} className="flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-3xl bg-white shadow-lift">
+                <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                            <Building2 className="w-5 h-5" aria-hidden="true" />
-                        </div>
+                        <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500"><Building2 className="size-5" aria-hidden="true" /></span>
                         <div>
-                            <h2 className="text-xl font-bold">Proposer une structure</h2>
-                            <p className="text-white/70 text-sm">Soumise à validation Playlife</p>
+                            <h2 className="text-xl font-semibold">Proposer une structure</h2>
+                            <p className="text-sm text-gray-500">Elle sera publiée après validation par l'équipe Playlife.</p>
                         </div>
                     </div>
-                    <button type="button" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Fermer">
-                        <X className="w-5 h-5" aria-hidden="true" />
+                    <button type="button" onClick={onClose} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-ink-900" aria-label="Fermer">
+                        <X className="size-5" aria-hidden="true" />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field id="structure-name" label="Nom de la structure" icon={Building2} required>
-                            <input id="structure-name" name="name" type="text" required value={form.name} onChange={handleChange} className={inputClass} placeholder="Ex : Association sportive locale" />
+                <div className="flex-1 space-y-5 overflow-y-auto p-6">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Field id="structure-name" label="Nom de la structure" required>
+                            <Input {...bind('name')} required placeholder="Ex : Association sportive locale" />
                         </Field>
-                        <Field id="structure-type" label="Type" icon={Tag}>
-                            <select id="structure-type" name="type" value={form.type} onChange={handleChange} className={inputClass}>
-                                <option value="">Sélectionner un type</option>
+                        <Field id="structure-type" label="Type">
+                            <Select {...bind('type')}>
+                                <option value="">Sélectionner</option>
                                 {STRUCTURE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
+                            </Select>
                         </Field>
                     </div>
-
-                    <Field id="structure-contact" label="Nom du contact" icon={User} required>
-                        <input id="structure-contact" name="contact_name" type="text" required autoComplete="off" value={form.contact_name} onChange={handleChange} className={inputClass} placeholder="Ex : Jean Dupont" />
+                    <Field id="structure-contact_name" label="Nom du contact" required>
+                        <Input {...bind('contact_name')} required autoComplete="off" placeholder="Ex : Aminata Diallo" />
                     </Field>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Field id="structure-address" label="Adresse" icon={MapPin} required className="md:col-span-3">
-                            <input id="structure-address" name="address" type="text" required value={form.address} onChange={handleChange} className={inputClass} placeholder="Ex : 123 rue de la Paix" />
-                        </Field>
-                        <Field id="structure-postal" label="Code postal">
-                            <input id="structure-postal" name="postal_code" type="text" value={form.postal_code} onChange={handleChange} className={inputClass} placeholder="Ex : 75001" />
-                        </Field>
-                        <Field id="structure-city" label="Ville" required>
-                            <input id="structure-city" name="city" type="text" required value={form.city} onChange={handleChange} className={inputClass} placeholder="Ex : Dakar" />
-                        </Field>
+                    <Field id="structure-address" label="Adresse" required>
+                        <Input {...bind('address')} required placeholder="Ex : 12 avenue Cheikh Anta Diop" />
+                    </Field>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <Field id="structure-postal_code" label="Code postal"><Input {...bind('postal_code')} /></Field>
+                        <Field id="structure-city" label="Ville" required><Input {...bind('city')} required placeholder="Ex : Dakar" /></Field>
                         <Field id="structure-country" label="Pays" required>
-                            <select id="structure-country" name="country" required value={form.country} onChange={handleChange} className={inputClass}>
+                            <Select {...bind('country')} required>
                                 <option value="">Sélectionner</option>
                                 {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
+                            </Select>
                         </Field>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Field id="structure-phone" label="Téléphone" icon={Phone}>
-                            <input id="structure-phone" name="contact_phone" type="tel" value={form.contact_phone} onChange={handleChange} className={inputClass} placeholder="Ex : +221 77 123 45 67" />
-                        </Field>
-                        <Field id="structure-email" label="Email" icon={Mail} required>
-                            <input id="structure-email" name="contact_email" type="email" required value={form.contact_email} onChange={handleChange} className={inputClass} placeholder="Ex : contact@structure.org" />
-                        </Field>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Field id="structure-contact_email" label="Email" required><Input {...bind('contact_email')} type="email" required placeholder="contact@structure.org" /></Field>
+                        <Field id="structure-contact_phone" label="Téléphone"><Input {...bind('contact_phone')} type="tel" placeholder="+221 77 123 45 67" /></Field>
                     </div>
-
-                    <Field id="structure-origin" label="Comment connaissez-vous cette structure ?" icon={FileText}>
-                        <textarea id="structure-origin" name="origin_info" rows={3} value={form.origin_info} onChange={handleChange} className={`${inputClass} resize-none`} placeholder="Ex : J'ai travaillé avec eux lors d'une mission précédente…" />
+                    <Field id="structure-origin_info" label="Comment connaissez-vous cette structure ?">
+                        <Textarea {...bind('origin_info')} rows={3} placeholder="Ex : j'ai travaillé avec eux lors d'une mission précédente…" />
                     </Field>
-
-                    <div className="pt-4 border-t border-gray-200 space-y-4">
-                        <p className="text-sm font-medium text-gray-500">Informations complémentaires (optionnel)</p>
-                        <Field id="structure-description" label="Description">
-                            <textarea id="structure-description" name="description" rows={3} value={form.description} onChange={handleChange} className={`${inputClass} resize-none`} placeholder="Décrivez brièvement la structure…" />
-                        </Field>
-                        <Field id="structure-website" label="Site web" icon={LinkIcon}>
-                            <input id="structure-website" name="website_url" type="url" value={form.website_url} onChange={handleChange} className={inputClass} placeholder="https://…" />
-                        </Field>
-                    </div>
+                    <details className="group rounded-2xl bg-surface-100 p-4 open:pb-5">
+                        <summary className="cursor-pointer list-none text-sm font-semibold text-ink-800 marker:hidden">
+                            <span className="group-open:hidden">+ Ajouter une description et un site web</span>
+                            <span className="hidden group-open:inline">Informations complémentaires</span>
+                        </summary>
+                        <div className="mt-4 space-y-4">
+                            <Field id="structure-description" label="Description"><Textarea {...bind('description')} rows={3} placeholder="Présentez brièvement la structure…" /></Field>
+                            <Field id="structure-website_url" label="Site web"><Input {...bind('website_url')} type="url" placeholder="https://…" /></Field>
+                        </div>
+                    </details>
                 </div>
 
-                <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
-                    <button type="button" onClick={onClose} className="flex-1 px-6 py-3 border border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-colors">
-                        Annuler
-                    </button>
-                    <button type="submit" disabled={loading} className="flex-1 px-6 py-3 bg-[#e6244d] text-white rounded-xl font-medium hover:bg-[#c91d41] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                        {loading ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Envoi…</> : 'Soumettre la structure'}
-                    </button>
+                <div className="flex flex-col-reverse gap-3 border-t border-gray-100 bg-gray-50/60 p-5 sm:flex-row sm:justify-end">
+                    <Button variant="secondary" onClick={onClose}>Annuler</Button>
+                    <Button type="submit" loading={loading}>Soumettre la structure</Button>
                 </div>
             </form>
         </Modal>

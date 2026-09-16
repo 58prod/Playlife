@@ -148,14 +148,14 @@ export function StructuresAdmin() {
     return (
         <section className="mb-12" aria-label="Structures">
             <SectionTitle icon={Building2} title="Structures" count={structures.length}>
-                <button type="button" onClick={() => { setCreating(v => !v); setEditingId(null); setDraft(EMPTY_STRUCTURE); }} className="flex items-center justify-center gap-2 px-4 py-2 bg-[#22081c] text-white rounded-xl text-sm font-medium hover:bg-[#1a0616] transition-colors">
+                <button type="button" onClick={() => { setCreating(v => !v); setEditingId(null); setDraft(EMPTY_STRUCTURE); }} className="flex items-center justify-center gap-2 px-4 py-2 bg-ink-900 text-white rounded-xl text-sm font-medium hover:bg-ink-950 transition-colors">
                     <Plus className="w-4 h-4" aria-hidden="true" /> Ajouter une structure
                 </button>
             </SectionTitle>
 
             {creating && (
-                <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4 shadow-sm">
-                    <h3 className="font-bold text-[#22081c] mb-4">Nouvelle structure</h3>
+                <div className="mb-4 rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
+                    <h3 className="font-bold text-ink-900 mb-4">Nouvelle structure</h3>
                     {editor(saveNew, () => setCreating(false), 'new-structure')}
                 </div>
             )}
@@ -184,13 +184,13 @@ export function StructuresAdmin() {
                             const status = structure.status ?? 'à valider playlife';
                             const badge = STATUS_BADGES[status];
                             return (
-                                <li key={structure.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                <li key={structure.id} className="overflow-hidden rounded-2xl bg-white shadow-soft ring-1 ring-ink-900/[0.06]">
                                     <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                         <button type="button" onClick={() => setExpandedId(expanded ? null : structure.id)} className="flex items-center gap-2 flex-1 min-w-0 text-left" aria-expanded={expanded}>
                                             <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`} aria-hidden="true" />
                                             <span className="flex-1 min-w-0">
                                                 <span className="flex items-center gap-2 flex-wrap">
-                                                    <span className="font-bold text-[#22081c] break-words">{structure.name}</span>
+                                                    <span className="font-bold text-ink-900 break-words">{structure.name}</span>
                                                     <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${badge.className}`}>{badge.label}</span>
                                                     {structure.validated_by_playlife && (
                                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-600 text-xs font-semibold rounded-full border border-orange-200">
@@ -220,7 +220,7 @@ export function StructuresAdmin() {
                                                     <BadgeCheck className="w-4 h-4" aria-hidden="true" /> {structure.validated_by_playlife ? 'Retirer le label' : 'Label Playlife'}
                                                 </button>
                                             )}
-                                            <button type="button" onClick={() => startEditing(structure)} className="flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 text-[#e6244d] rounded-lg text-sm font-medium hover:bg-pink-100 transition-colors">
+                                            <button type="button" onClick={() => startEditing(structure)} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-500 rounded-lg text-sm font-medium hover:bg-brand-100 transition-colors">
                                                 <Edit2 className="w-4 h-4" aria-hidden="true" /> Modifier
                                             </button>
                                             <button type="button" onClick={() => handleDelete(structure)} className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" aria-label={`Supprimer ${structure.name}`}>
@@ -229,15 +229,15 @@ export function StructuresAdmin() {
                                         </div>
                                     </div>
                                     {expanded && (
-                                        <div className="border-t border-gray-100 p-4 bg-gray-50 text-sm">
+                                        <div className="border-t border-gray-100 bg-surface-50 p-4 text-sm">
                                             {editingId === structure.id ? editor(saveEdit, () => setEditingId(null), `edit-${structure.id}`) : (
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                                                     {structure.description && <p className="md:col-span-2 text-gray-700 whitespace-pre-line">{structure.description}</p>}
                                                     {structure.contact_name && <p><span className="text-gray-500">Contact :</span> <span className="font-medium">{structure.contact_name}</span></p>}
-                                                    {structure.contact_email && <p><span className="text-gray-500">Email :</span> <a href={`mailto:${structure.contact_email}`} className="font-medium hover:text-[#e6244d] break-all">{structure.contact_email}</a></p>}
+                                                    {structure.contact_email && <p><span className="text-gray-500">Email :</span> <a href={`mailto:${structure.contact_email}`} className="font-medium hover:text-brand-500 break-all">{structure.contact_email}</a></p>}
                                                     {structure.contact_phone && <p><span className="text-gray-500">Téléphone :</span> <span className="font-medium">{structure.contact_phone}</span></p>}
                                                     {(structure.address || structure.postal_code) && <p><span className="text-gray-500">Adresse :</span> <span className="font-medium">{[structure.address, structure.postal_code].filter(Boolean).join(', ')}</span></p>}
-                                                    {structure.website_url && <p className="md:col-span-2"><span className="text-gray-500">Site web :</span> <a href={structure.website_url} target="_blank" rel="noopener noreferrer" className="text-[#e6244d] hover:underline break-all">{structure.website_url}</a></p>}
+                                                    {structure.website_url && <p className="md:col-span-2"><span className="text-gray-500">Site web :</span> <a href={structure.website_url} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline break-all">{structure.website_url}</a></p>}
                                                     {structure.origin_info && <p className="md:col-span-2 bg-white p-3 rounded-lg border border-gray-100"><span className="text-gray-500 block mb-1">Comment la personne connaît la structure :</span><span className="italic text-gray-700">{structure.origin_info}</span></p>}
                                                     <p><span className="text-gray-500">Proposée le :</span> <span className="font-medium">{formatDate(structure.created_at)}</span></p>
                                                 </div>

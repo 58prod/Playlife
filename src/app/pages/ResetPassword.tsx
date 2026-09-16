@@ -21,7 +21,7 @@ export default function ResetPassword() {
     if (!user) {
         return (
             <AuthLayout icon={KeyRound} title="Lien expiré" subtitle="Ce lien de réinitialisation n'est plus valide.">
-                <Link to="/mot-de-passe-oublie" className="block text-center w-full py-4 bg-[#e6244d] text-white font-bold rounded-xl hover:bg-[#c91d41] transition-all">
+                <Link to="/mot-de-passe-oublie" className="flex h-13 w-full items-center justify-center rounded-xl bg-brand-500 font-semibold text-white shadow-brand transition hover:bg-brand-600">
                     Demander un nouveau lien
                 </Link>
             </AuthLayout>

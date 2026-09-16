@@ -36,20 +36,20 @@ export default function Login() {
     if (authLoading || user) return <PageLoader label="Vérification de votre session…" />;
 
     return (
-        <AuthLayout icon={LogIn} title="Heureux de vous revoir" subtitle="Connectez-vous à votre espace Playlife" error={error}>
+        <AuthLayout icon={LogIn} title="Bon retour parmi nous" subtitle="Connectez-vous pour suivre vos missions Playlife." error={error}>
             <form onSubmit={handleLogin} className="space-y-4">
                 <AuthField id="login-email" label="Email" icon={Mail} type="email" required autoComplete="email"
                     value={email} onChange={e => setEmail(e.target.value)} placeholder="jean.dupont@example.com" />
                 <AuthField id="login-password" label="Mot de passe" icon={Lock} type="password" required autoComplete="current-password"
                     value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" />
                 <div className="text-right">
-                    <Link to="/mot-de-passe-oublie" className="text-sm text-[#e6244d] hover:underline">Mot de passe oublié ?</Link>
+                    <Link to="/mot-de-passe-oublie" className="text-sm font-medium text-brand-600 hover:text-brand-700">Mot de passe oublié ?</Link>
                 </div>
                 <SubmitButton loading={loading}>Se connecter</SubmitButton>
             </form>
             <p className="text-center text-gray-500 mt-6 text-sm">
                 Pas encore de compte ?{' '}
-                <Link to={`/register?${searchParams.toString()}`} className="text-[#e6244d] font-bold hover:underline">S'inscrire</Link>
+                <Link to={`/register?${searchParams.toString()}`} className="font-semibold text-brand-600 hover:text-brand-700">S'inscrire</Link>
             </p>
         </AuthLayout>
     );

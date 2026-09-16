@@ -41,14 +41,14 @@ export function ImpactMetricsAdmin() {
         <div>
             <label htmlFor={`impact-${key}`} className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
             <input id={`impact-${key}`} type="text" value={metrics[key]} onChange={e => setMetrics(m => ({ ...m, [key]: e.target.value }))}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#e6244d]/20 outline-none" />
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 outline-none" />
         </div>
     );
 
     return (
         <section className="mb-12" aria-label="Chiffres clés">
             <SectionTitle icon={TrendingUp} title="Chiffres clés (accueil et contact)" />
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <fieldset className="space-y-4">
                         <legend className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Chiffre clé 1</legend>
@@ -61,7 +61,7 @@ export function ImpactMetricsAdmin() {
                         {field('label2', 'Libellé (ex : enfants aidés)')}
                     </fieldset>
                 </div>
-                <button type="button" onClick={save} disabled={saving} className="mt-8 flex items-center gap-2 px-6 py-3 bg-[#22081c] text-white rounded-xl font-bold hover:bg-[#1a0616] transition-all disabled:opacity-50">
+                <button type="button" onClick={save} disabled={saving} className="mt-8 flex items-center gap-2 px-6 py-3 bg-ink-900 text-white rounded-xl font-bold hover:bg-ink-950 transition-all disabled:opacity-50">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                     Enregistrer les chiffres clés
                 </button>
@@ -123,7 +123,7 @@ export function SlideshowAdmin() {
     return (
         <section className="mb-12" aria-label="Diaporama">
             <SectionTitle icon={ImageIcon} title="Photos du diaporama d'accueil" count={photos.length} />
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
                 {photos.length > 0 ? (
                     <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
                         {photos.map((url, index) => (
@@ -142,7 +142,7 @@ export function SlideshowAdmin() {
                 ) : (
                     <p className="text-gray-500 text-sm mb-6">Aucune photo personnalisée : les photos par défaut sont affichées.</p>
                 )}
-                <label className={`inline-flex items-center gap-2 px-5 py-2.5 bg-[#e6244d] text-white rounded-xl font-medium hover:bg-[#d11d42] transition-colors text-sm ${uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}>
+                <label className={`inline-flex items-center gap-2 px-5 py-2.5 bg-brand-500 text-white rounded-xl font-medium hover:bg-brand-600 transition-colors text-sm ${uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}>
                     <input type="file" accept="image/*" multiple className="sr-only" onChange={handleUpload} disabled={uploading} />
                     {uploading ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Upload className="w-4 h-4" aria-hidden="true" />}
                     {uploading ? 'Envoi en cours…' : 'Ajouter des photos'}

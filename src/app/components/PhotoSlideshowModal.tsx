@@ -8,10 +8,11 @@ interface PhotoSlideshowModalProps {
     title: string;
     onClose: () => void;
     onDelete?: (photo: MissionMedia) => void;
+    initialIndex?: number;
 }
 
-export function PhotoSlideshowModal({ photos, title, onClose, onDelete }: PhotoSlideshowModalProps) {
-    const [index, setIndex] = useState(0);
+export function PhotoSlideshowModal({ photos, title, onClose, onDelete, initialIndex = 0 }: PhotoSlideshowModalProps) {
+    const [index, setIndex] = useState(initialIndex);
     const count = photos.length;
     const safeIndex = Math.min(index, count - 1);
     const current = photos[safeIndex];

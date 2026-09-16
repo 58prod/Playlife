@@ -1,120 +1,57 @@
-import { Building2, FileText, Mail, MapPin, Phone } from 'lucide-react';
+import { Building2, Mail, MapPin, Phone, User } from 'lucide-react';
 import { useImpactMetrics } from '@/hooks/useSiteConfig';
-import { AuthCard } from '../components/AuthCard';
-import { ImpactCard } from '../components/ImpactCard';
+import heart from '@/assets/coeur-playlife.png';
+import { PageHeader } from '../components/ui/PageHeader';
+
+const CONTACTS = [
+    { icon: Mail, label: 'Email', value: 'playlife-connect@playlife.today', href: 'mailto:playlife-connect@playlife.today', wide: true },
+    { icon: Phone, label: 'Téléphone', value: '+33 6 63 07 04 35', href: 'tel:+33663070435' },
+    { icon: User, label: 'Contact', value: 'Christophe Grassi' },
+    { icon: MapPin, label: 'Adresse', value: '151 rue de la Fouillade\n34820 Teyran' },
+];
 
 export default function Contact() {
-    const impactMetrics = useImpactMetrics();
+    const metrics = useImpactMetrics();
 
     return (
-        <div className="px-4 md:px-8 py-4 md:py-6">
-            {/* Header with title */}
-            <div className="mb-6 md:mb-10">
-                <h1 className="text-2xl md:text-4xl font-bold text-[#22081c] leading-tight max-w-3xl mb-2 md:mb-3">
-                    Contact
-                </h1>
-                <p className="text-sm md:text-base text-gray-600 italic">
-                    Une question sur une mission, un pack ou une structure ? Écrivez-nous.
-                </p>
-            </div>
+        <div className="container-page pt-8 lg:pt-14">
+            <PageHeader eyebrow="Contact" title="Parlons de votre mission" description="Une question sur une mission, un pack ou une structure ? Écrivez-nous ou appelez-nous, nous répondons rapidement." />
 
-            {/* Main Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-
-                {/* Left Column - 2/3 width on desktop */}
-                <div className="lg:col-span-8 space-y-6">
-
-                    {/* Contact Information Card - Full width */}
-                    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
-                        <div className="flex items-start justify-between mb-4 md:mb-6">
-                            <div>
-                                <h2 className="text-xl md:text-2xl font-semibold text-[#22081c] mb-2">Rentrons en contact</h2>
-                                <p className="text-xs md:text-sm text-gray-600 italic">N'hésitez pas à nous contacter pour toute précision ou renseignement</p>
-                            </div>
-                        </div>
-
-                        <div className="w-12 h-1 bg-[#e6244d] rounded-full mb-6 md:mb-8"></div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Contact Person */}
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-[#e6244d] shrink-0">
-                                    <FileText className="w-6 h-6" aria-hidden="true" />
+            <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+                <div className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06] md:p-10">
+                    <ul className="grid gap-8 sm:grid-cols-2">
+                        {CONTACTS.map(({ icon: Icon, label, value, href, wide }) => (
+                            <li key={label} className={`flex gap-4 ${wide ? 'sm:col-span-2' : ''}`}>
+                                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-500"><Icon className="size-5" aria-hidden="true" /></span>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>
+                                    {href ? (
+                                        <a href={href} className="mt-1 block break-words font-semibold text-ink-900 hover:text-brand-600">{value}</a>
+                                    ) : (
+                                        <p className="mt-1 whitespace-pre-line font-semibold text-ink-900">{value}</p>
+                                    )}
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Contact</p>
-                                    <p className="font-bold text-[#22081c]">Christophe Grassi</p>
-                                </div>
-                            </div>
-
-                            {/* Address */}
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 shrink-0">
-                                    <MapPin className="w-6 h-6" aria-hidden="true" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Adresse</p>
-                                    <p className="font-bold text-[#22081c]">151 rue de la Fouillade</p>
-                                    <p className="font-bold text-[#22081c]">34820 Teyran</p>
-                                </div>
-                            </div>
-
-                            {/* Phone */}
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
-                                    <Phone className="w-6 h-6" aria-hidden="true" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Téléphone</p>
-                                    <a href="tel:+33663070435" className="font-bold text-[#22081c] hover:text-[#e6244d] transition-colors break-all">
-                                        +33 6 63 07 04 35
-                                    </a>
-                                </div>
-                            </div>
-
-                            {/* Email */}
-                            <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-[#e6244d] shrink-0">
-                                    <Mail className="w-6 h-6" aria-hidden="true" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Email</p>
-                                    <a
-                                        href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#112;&#108;&#97;&#121;&#108;&#105;&#102;&#101;&#45;&#99;&#111;&#110;&#110;&#101;&#99;&#116;&#64;&#112;&#108;&#97;&#121;&#108;&#105;&#102;&#101;&#46;&#116;&#111;&#100;&#97;&#121;"
-                                        className="font-bold text-[#22081c] hover:text-[#e6244d] transition-colors break-all"
-                                    >
-                                        playlife-connect@playlife.today
-                                    </a>
-                                </div>
-                            </div>
-
-                            {/* Legal Info */}
-                            <div className="md:col-span-2 flex items-start gap-4">
-                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-600 shrink-0">
-                                    <Building2 className="w-6 h-6" aria-hidden="true" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Informations légales</p>
-                                    <p className="font-bold text-[#22081c]">Association loi 1901</p>
-                                    <p className="text-sm text-gray-600">Siret : 99125290900015</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* Right Column - Impact Stats (dark) - 1/3 width on desktop */}
-                <div className="lg:col-span-4">
-                    <div className="lg:sticky lg:top-6 space-y-6">
-                        {/* Auth Card - Desktop only (mobile at top) */}
-                        <AuthCard />
-
-                        <ImpactCard metrics={impactMetrics} />
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="mt-10 flex items-center gap-4 rounded-2xl bg-surface-100 p-5">
+                        <Building2 className="size-5 shrink-0 text-ink-700" aria-hidden="true" />
+                        <p className="text-sm text-ink-800"><strong>Playlife Connect</strong> — Association loi 1901 · SIRET 991 252 909 00015</p>
                     </div>
                 </div>
 
+                <div className="relative overflow-hidden rounded-3xl bg-ink-900 p-8 text-white md:p-10">
+                    <img src={heart} alt="" aria-hidden="true" className="absolute -bottom-10 -right-10 w-48 rotate-12 opacity-90" />
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">Notre impact</p>
+                    <dl className="relative mt-8 space-y-8">
+                        {[[metrics.value1, metrics.label1], [metrics.value2, metrics.label2]].map(([value, label]) => (
+                            <div key={label} className="flex flex-col-reverse">
+                                <dt className="text-ink-200">{label}</dt>
+                                <dd className="font-display text-6xl font-bold tabular-nums">{value}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                </div>
             </div>
         </div>
     );

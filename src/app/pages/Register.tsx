@@ -59,12 +59,12 @@ export default function Register() {
             <AuthLayout icon={CheckCircle} title="Inscription réussie !">
                 <div className="text-center" role="status">
                     <p className="text-gray-600 mb-2">Un email de confirmation a été envoyé à :</p>
-                    <p className="font-bold text-[#22081c] mb-6 break-all">{registeredEmail}</p>
+                    <p className="font-bold text-ink-900 mb-6 break-all">{registeredEmail}</p>
                     <p className="text-gray-500 text-sm mb-8">
                         Cliquez sur le lien dans l'email pour activer votre compte, puis connectez-vous.
                         Pensez à vérifier vos courriers indésirables.
                     </p>
-                    <Link to="/login" className="block w-full py-4 bg-[#e6244d] text-white font-bold rounded-xl hover:bg-[#c91d41] transition-all">
+                    <Link to="/login" className="flex h-13 w-full items-center justify-center rounded-xl bg-brand-500 font-semibold text-white shadow-brand transition hover:bg-brand-600">
                         Aller à la page de connexion
                     </Link>
                 </div>
@@ -77,18 +77,18 @@ export default function Register() {
             type="button"
             onClick={() => setRole(value)}
             aria-pressed={role === value}
-            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${role === value ? 'border-[#e6244d] bg-[#e6244d]/5' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+            className={`flex flex-col items-center gap-2 rounded-2xl bg-white p-4 ring-inset transition ${role === value ? 'ring-2 ring-brand-500 shadow-soft' : 'ring-1 ring-gray-200 hover:ring-gray-300'}`}
         >
-            <Icon className={`w-6 h-6 ${role === value ? 'text-[#e6244d]' : 'text-gray-400'}`} />
-            <span className={`text-xs font-bold text-center ${role === value ? 'text-[#e6244d]' : 'text-gray-500'}`}>{label}</span>
+            <Icon className={`w-6 h-6 ${role === value ? 'text-brand-500' : 'text-gray-400'}`} />
+            <span className={`text-center text-sm font-semibold ${role === value ? 'text-ink-900' : 'text-gray-600'}`}>{label}</span>
         </button>
     );
 
     return (
-        <AuthLayout icon={UserPlus} title="Rejoignez Playlife" subtitle="Commencez votre aventure solidaire" error={error}>
+        <AuthLayout icon={UserPlus} title="Rejoignez Playlife" subtitle="Créez votre compte et lancez votre première mission solidaire." error={error}>
             <form onSubmit={handleRegister} className="space-y-4">
                 <fieldset>
-                    <legend className="block text-sm font-semibold text-gray-700 mb-2">Je suis</legend>
+                    <legend className="mb-2 block text-sm font-medium text-ink-800">Je suis</legend>
                     <div className="grid grid-cols-2 gap-3 mb-2">
                         {roleOption('voyageur', 'Voyageur solidaire', Plane)}
                         {roleOption('animateur', 'Animateur / Enseignant', GraduationCap)}
@@ -105,7 +105,7 @@ export default function Register() {
             </form>
             <p className="text-center text-gray-500 mt-6 text-sm">
                 Déjà un compte ?{' '}
-                <Link to={`/login?${searchParams.toString()}`} className="text-[#e6244d] font-bold hover:underline">Se connecter</Link>
+                <Link to={`/login?${searchParams.toString()}`} className="font-semibold text-brand-600 hover:text-brand-700">Se connecter</Link>
             </p>
         </AuthLayout>
     );

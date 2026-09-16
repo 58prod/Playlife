@@ -15,7 +15,7 @@ interface ModalProps {
 }
 
 /** Fenêtre modale accessible : Échap pour fermer, focus conservé, défilement de la page bloqué. */
-export function Modal({ onClose, label, children, className = '', closeOnBackdrop = false, backdropClassName = 'bg-[#22081c]/60 backdrop-blur-sm' }: ModalProps) {
+export function Modal({ onClose, label, children, className = '', closeOnBackdrop = false, backdropClassName = 'bg-ink-950/50 backdrop-blur-sm' }: ModalProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
     const onCloseRef = useRef(onClose);
     onCloseRef.current = onClose;
@@ -42,10 +42,10 @@ export function Modal({ onClose, label, children, className = '', closeOnBackdro
 
     return createPortal(
         <div
-            className={`fixed inset-0 z-[60] flex items-center justify-center p-4 ${backdropClassName}`}
+            className={`fixed inset-0 z-[60] flex items-center justify-center p-4 animate-[fade-up_0.2s_ease-out] ${backdropClassName}`}
             onMouseDown={e => { if (closeOnBackdrop && e.target === e.currentTarget) onClose(); }}
         >
-            <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className={`outline-none ${className}`}>
+            <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className={`outline-none animate-pop ${className}`}>
                 {children}
             </div>
         </div>,

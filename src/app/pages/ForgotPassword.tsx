@@ -30,7 +30,7 @@ export default function ForgotPassword() {
                     <p className="text-gray-600">
                         Si un compte existe pour <strong className="break-all">{email}</strong>, un email contenant un lien de réinitialisation vient d'être envoyé.
                     </p>
-                    <Link to="/login" className="block w-full py-4 bg-[#e6244d] text-white font-bold rounded-xl hover:bg-[#c91d41] transition-all">
+                    <Link to="/login" className="flex h-13 w-full items-center justify-center rounded-xl bg-brand-500 font-semibold text-white shadow-brand transition hover:bg-brand-600">
                         Retour à la connexion
                     </Link>
                 </div>
@@ -40,7 +40,7 @@ export default function ForgotPassword() {
                         value={email} onChange={e => setEmail(e.target.value)} placeholder="jean.dupont@example.com" />
                     <SubmitButton loading={loading}>Envoyer le lien</SubmitButton>
                     <p className="text-center text-sm">
-                        <Link to="/login" className="text-[#e6244d] hover:underline">Retour à la connexion</Link>
+                        <Link to="/login" className="font-medium text-brand-600 hover:text-brand-700">Retour à la connexion</Link>
                     </p>
                 </form>
             )}

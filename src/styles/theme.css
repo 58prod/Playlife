@@ -1,152 +1,122 @@
+/* ============================================================================
+   Playlife Connect — système de design
+   Police : Inter (identique à la présentation du stand). Couleurs issues du logo : aubergine #301536, rouge #e61a4e ; surfaces blanc froid
+   ============================================================================ */
 
-:root {
-  --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
+  /* Rouge Playlife */
+  --color-brand-50: #fff1f4;
+  --color-brand-100: #ffe0e7;
+  --color-brand-200: #ffc6d3;
+  --color-brand-300: #ff97ae;
+  --color-brand-400: #fb5b80;
+  --color-brand-500: #e61a4e;
+  --color-brand-600: #cc1043;
+  --color-brand-700: #aa0d3a;
+  --color-brand-800: #8e0f37;
+  --color-brand-900: #790f34;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-input-background: var(--input-background);
-  --color-switch-background: var(--switch-background);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: var(--radius);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  /* Aubergine Playlife */
+  --color-ink-50: #f7f3f8;
+  --color-ink-100: #eee6f0;
+  --color-ink-200: #dccbe0;
+  --color-ink-300: #c2a5c8;
+  --color-ink-400: #9f75a7;
+  --color-ink-500: #7e5287;
+  --color-ink-600: #643e6c;
+  --color-ink-700: #4f3155;
+  --color-ink-800: #3e2444;
+  --color-ink-900: #301536;
+  --color-ink-950: #1d0a21;
+
+  /* Surfaces : blanc cassé froid, très légèrement teinté aubergine */
+  --color-surface-50: #fafafc;
+  --color-surface-100: #f3f2f7;
+  --color-surface-200: #ebe9f1;
+  --color-surface-300: #dedbe7;
+
+  /* Gris neutres légèrement teintés aubergine */
+  --color-gray-50: #f9f9fb;
+  --color-gray-100: #f1f0f4;
+  --color-gray-200: #e4e2ea;
+  --color-gray-300: #d0cdd8;
+  --color-gray-400: #a29eae;
+  --color-gray-500: #75707f;
+  --color-gray-600: #585361;
+  --color-gray-700: #433e4b;
+  --color-gray-800: #2d2834;
+  --color-gray-900: #1e1a23;
+
+  --shadow-soft: 0 1px 2px rgb(48 21 54 / 0.04), 0 4px 16px -4px rgb(48 21 54 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(48 21 54 / 0.04), 0 16px 40px -12px rgb(48 21 54 / 0.18);
+  --shadow-brand: 0 8px 24px -8px rgb(230 26 78 / 0.45);
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pop: pop 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-surface-50 font-sans text-ink-900;
+    font-feature-settings: 'cv11', 'ss01';
   }
 
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
-
-  html {
-    font-size: var(--font-size);
+  h1, h2, h3, h4 {
+    @apply font-display text-ink-900;
+    letter-spacing: -0.025em;
+    font-feature-settings: 'ss01', 'cv05';
+    text-wrap: balance;
   }
 
-  h1 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  p {
+    text-wrap: pretty;
   }
 
-  h2 {
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  ::selection {
+    @apply bg-brand-100 text-ink-900;
   }
 
-  h3 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
   }
 
-  h4 {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  button:not(:disabled), [role='button']:not(:disabled) {
+    cursor: pointer;
   }
 
-  label {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  input::placeholder, textarea::placeholder {
+    @apply text-gray-400;
   }
 
-  button {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  input {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-normal);
-    line-height: 1.5;
-  }
-
-  /* Custom override for lg:top-6 */
-  @media (min-width: 64rem) {
-    .lg\:top-6 {
-      top: calc(var(--spacing) * 30) !important;
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
+}
+
+@utility container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10;
 }

@@ -1,23 +1,27 @@
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import {
-    ArrowRight, Calendar, CheckCircle, Edit2, Image as ImageIcon, Loader2, MapPin, Plus, Target, Trash2, Upload, User, Users, X,
-} from 'lucide-react';
+import { ArrowUpRight, Camera, CheckCircle2, Edit2, Heart, ImagePlus, Loader2, MapPin, Plus, Trash2, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { errorMessage } from '@/lib/errors';
+import { cn } from '@/lib/cn';
 import { avatarSrc, formatDateRange, missionLocation, pluralize, profileUserType, USER_TYPE_LABELS } from '@/lib/format';
 import { deleteMission, deleteMissionPhoto, fetchPhotosByMission } from '@/lib/missions';
 import { removePublicFile, uploadPublicFile, validateUpload } from '@/lib/storage';
 import type { Mission, MissionMedia, UserType } from '@/types/database.types';
 import { useConfirm } from '../components/ConfirmDialog';
+import { MissionCover } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
 import { MissionStatusBadge } from '../components/MissionBadges';
 import { Modal } from '../components/Modal';
-import { PageLoader } from '../components/PageLoader';
 import { PhotoSlideshowModal } from '../components/PhotoSlideshowModal';
 import { PhotoStrip } from '../components/PhotoStrip';
+import { Avatar } from '../components/UserMenu';
+import { Button, ButtonLink } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Field, Input, Select } from '../components/ui/Field';
+import { Skeleton } from '../components/ui/Skeleton';
 
 /** Estimation affichée dans le tableau de bord : nombre moyen d'enfants par pack remis. */
 const CHILDREN_PER_PACK = 20;
@@ -103,141 +107,102 @@ export default function Dashboard() {
     const slideshowPhotos = slideshowMissionId ? photosByMission[slideshowMissionId] ?? [] : [];
 
     const stats = [
-        { label: 'Mes missions', value: missions.length, icon: Target, color: 'bg-pink-50 text-[#e6244d]' },
-        { label: 'En cours', value: active.length, icon: Calendar, color: 'bg-blue-50 text-blue-500' },
-        { label: 'Terminées', value: completed.length, icon: CheckCircle, color: 'bg-green-50 text-green-500' },
-        { label: 'Enfants aidés (estimation)', value: completed.length * CHILDREN_PER_PACK, icon: Users, color: 'bg-purple-50 text-purple-500' },
+        { label: 'Missions', value: missions.length },
+        { label: 'En cours', value: active.length },
+        { label: 'Terminées', value: completed.length },
+        { label: 'Enfants aidés (estim.)', value: completed.length * CHILDREN_PER_PACK },
     ];
 
     const renderMissionCard = (mission: Mission) => {
         const isCompleted = mission.status === 'completed';
         const photos = photosByMission[mission.id] ?? [];
+        const action = 'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-medium transition';
         return (
-            <article key={mission.id} className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-md transition-all group flex flex-col">
-                {mission.image_url && (
-                    <div className="h-36 overflow-hidden">
-                        <img src={mission.image_url} alt="" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    </div>
-                )}
-                <div className="p-4 flex-1 flex flex-col">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                        <h4 className="font-bold text-[#22081c] line-clamp-2 flex-1 break-words">{mission.title}</h4>
-                        <MissionStatusBadge mission={mission} />
-                    </div>
-                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">{mission.description}</p>
-                    <div className="flex flex-col gap-2 mb-3 text-xs">
-                        <div className="flex items-center justify-between gap-2">
-                            <span className="flex items-center gap-2 text-gray-500 font-medium min-w-0">
-                                <MapPin className="w-3.5 h-3.5 text-[#e6244d] shrink-0" aria-hidden="true" />
-                                <span className="truncate">{missionLocation(mission)}</span>
-                            </span>
-                            <span className="font-bold uppercase tracking-tight text-gray-400 shrink-0">
-                                {mission.mission_type === 'animateur' ? 'Animateur' : 'Voyageur'}
-                            </span>
-                        </div>
-                        <span className="flex items-center gap-2 text-gray-400">
-                            <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                            {formatDateRange(mission.start_date, mission.end_date)}
-                        </span>
-                    </div>
-
-                    <div className="mt-auto flex gap-2 pt-2 border-t border-gray-200">
-                        <button type="button" onClick={() => setEditingMission(mission)} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors" aria-label={`Modifier la mission ${mission.title}`}>
-                            <Edit2 className="w-3.5 h-3.5" aria-hidden="true" /> Modifier
-                        </button>
+            <article key={mission.id} className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-soft ring-1 ring-ink-900/[0.06]">
+                <Link to={`/missions/${mission.id}`} className="relative block aspect-[16/8] overflow-hidden" aria-label={`Voir la mission ${mission.title}`}>
+                    <MissionCover mission={mission} className="transition duration-500 group-hover:scale-105" />
+                    <span className="absolute right-3 top-3"><MissionStatusBadge mission={mission} /></span>
+                </Link>
+                <div className="flex flex-1 flex-col p-5">
+                    <h3 className="text-lg font-semibold leading-snug">
+                        <Link to={`/missions/${mission.id}`} className="hover:text-brand-600">{mission.title}</Link>
+                    </h3>
+                    <p className="mt-2 flex items-center gap-1.5 text-sm text-gray-600">
+                        <MapPin className="size-4 shrink-0 text-brand-500" aria-hidden="true" />
+                        <span className="truncate">{missionLocation(mission)} · {formatDateRange(mission.start_date, mission.end_date)}</span>
+                    </p>
+                    {isCompleted && photos.length > 0 && (
+                        <PhotoStrip photos={photos} missionTitle={mission.title} onOpen={() => setSlideshowMissionId(mission.id)} />
+                    )}
+                    <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 [&:not(:first-child)]:mt-4">
                         {isCompleted ? (
-                            <button type="button" onClick={() => setMediaUploadMission(mission)} className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors" aria-label={`Ajouter des photos à la mission ${mission.title}`}>
-                                <ImageIcon className="w-3.5 h-3.5" aria-hidden="true" /> Photos
+                            <button type="button" onClick={() => setMediaUploadMission(mission)} className={cn(action, 'bg-brand-50 text-brand-700 hover:bg-brand-100')}>
+                                <ImagePlus className="size-4" aria-hidden="true" /> Ajouter des photos
                             </button>
                         ) : (
-                            <button type="button" onClick={() => handleCompleteMission(mission)} className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors" aria-label={`Marquer la mission ${mission.title} comme terminée`}>
-                                <CheckCircle className="w-3.5 h-3.5" aria-hidden="true" /> Terminée
+                            <button type="button" onClick={() => handleCompleteMission(mission)} className={cn(action, 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100')}>
+                                <CheckCircle2 className="size-4" aria-hidden="true" /> Mission accomplie
                             </button>
                         )}
-                        <button type="button" onClick={() => handleDeleteMission(mission)} className="flex items-center justify-center px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors" aria-label={`Supprimer la mission ${mission.title}`}>
-                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                        <button type="button" onClick={() => setEditingMission(mission)} className={cn(action, 'text-ink-800 hover:bg-ink-50')} aria-label={`Modifier la mission ${mission.title}`}>
+                            <Edit2 className="size-4" aria-hidden="true" /> Modifier
+                        </button>
+                        <button type="button" onClick={() => handleDeleteMission(mission)} className={cn(action, 'ml-auto px-2.5 text-gray-400 hover:bg-red-50 hover:text-red-600')} aria-label={`Supprimer la mission ${mission.title}`}>
+                            <Trash2 className="size-4" aria-hidden="true" />
                         </button>
                     </div>
-
-                    {isCompleted && photos.length > 0 && (
-                        <div className="mt-3 pt-1 border-t border-gray-200">
-                            <PhotoStrip photos={photos} missionTitle={mission.title} onOpen={() => setSlideshowMissionId(mission.id)} />
-                        </div>
-                    )}
                 </div>
             </article>
         );
     };
 
     return (
-        <div className="px-4 md:px-8 py-4 md:py-6 space-y-8">
-            <ProfileBanner onNewMission={() => setIsFormOpen(true)} />
+        <div className="container-page pt-8 lg:pt-12">
+            <ProfileHeader onNewMission={() => setIsFormOpen(true)} />
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div key={label} className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4">
-                            <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
-                                <Icon className="w-6 h-6 md:w-7 md:h-7" aria-hidden="true" />
-                            </div>
-                            <div>
-                                <p className="text-gray-500 text-xs md:text-sm">{label}</p>
-                                <p className="text-2xl md:text-3xl font-bold text-[#22081c]">{value}</p>
-                            </div>
-                        </div>
+            <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-ink-900/[0.06] shadow-soft ring-1 ring-ink-900/[0.06] lg:grid-cols-4">
+                {stats.map(({ label, value }) => (
+                    <div key={label} className="flex flex-col-reverse bg-white px-5 py-5 md:px-6">
+                        <dt className="text-sm text-gray-600">{label}</dt>
+                        <dd className="font-display text-3xl font-bold tabular-nums text-ink-900">{loading ? '—' : value}</dd>
                     </div>
                 ))}
-            </div>
+            </dl>
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <h2 className="text-xl font-bold text-[#22081c]">Mes missions</h2>
-                        <p className="text-gray-500 text-sm mt-1">Gérez et suivez vos missions solidaires</p>
-                    </div>
-                    <Link to="/missions" className="text-[#e6244d] hover:text-[#c91d41] text-sm font-medium flex items-center gap-1 shrink-0">
-                        Toutes les missions <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                    </Link>
-                </div>
-
+            <div className="mt-12">
                 {loading ? (
-                    <PageLoader label="Chargement de vos missions…" />
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {[0, 1, 2].map(i => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+                    </div>
                 ) : missions.length > 0 ? (
-                    <>
+                    <div className="space-y-12">
                         {[{ id: 'active', title: 'Missions en cours', list: active }, { id: 'completed', title: 'Missions terminées', list: completed }]
                             .filter(section => section.list.length > 0)
                             .map(section => (
-                                <section key={section.id} aria-labelledby={`${section.id}-heading`} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                                    <h3 id={`${section.id}-heading`} className="p-5 border-b border-gray-100 text-base font-bold text-[#22081c]">
-                                        {section.title} <span className="text-sm font-normal text-gray-400">({section.list.length})</span>
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4 md:p-6">
+                                <section key={section.id} aria-labelledby={`${section.id}-heading`}>
+                                    <h2 id={`${section.id}-heading`} className="mb-5 text-2xl font-bold">
+                                        {section.title} <span className="text-base font-normal text-gray-500">({section.list.length})</span>
+                                    </h2>
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                                         {section.list.map(renderMissionCard)}
                                     </div>
                                 </section>
                             ))}
-                    </>
-                ) : (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Target className="w-8 h-8 text-gray-400" aria-hidden="true" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-[#22081c] mb-2">Aucune mission</h3>
-                        <p className="text-gray-500 mb-6">Vous n'avez pas encore créé de mission.</p>
-                        <button type="button" onClick={() => setIsFormOpen(true)} className="inline-flex items-center gap-2 bg-[#e6244d] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#c91d41] transition-colors">
-                            <Plus className="w-5 h-5" aria-hidden="true" /> Créer ma première mission
-                        </button>
                     </div>
+                ) : (
+                    <EmptyState
+                        icon={Heart}
+                        title="Votre première mission vous attend"
+                        description="Créez une mission en quelques minutes : l'équipe Playlife la valide puis vous accompagne jusqu'à la remise du pack."
+                        action={<Button icon={Plus} onClick={() => setIsFormOpen(true)}>Créer ma première mission</Button>}
+                    />
                 )}
             </div>
 
             {isFormOpen && <MissionForm onClose={() => setIsFormOpen(false)} onSuccess={fetchUserMissions} />}
             {editingMission && <MissionForm initialData={editingMission} onClose={() => setEditingMission(null)} onSuccess={fetchUserMissions} />}
             {mediaUploadMission && (
-                <MediaUploadModal
-                    mission={mediaUploadMission}
-                    onClose={() => { setMediaUploadMission(null); fetchUserMissions(); }}
-                />
+                <MediaUploadModal mission={mediaUploadMission} onClose={() => { setMediaUploadMission(null); fetchUserMissions(); }} />
             )}
             {slideshowMission && slideshowPhotos.length > 0 && (
                 <PhotoSlideshowModal photos={slideshowPhotos} title={slideshowMission.title} onClose={() => setSlideshowMissionId(null)} onDelete={handleDeletePhoto} />
@@ -246,26 +211,45 @@ export default function Dashboard() {
     );
 }
 
-function ProfileBanner({ onNewMission }: { onNewMission: () => void }) {
-    const { user, profile, refreshProfile } = useAuth();
+function ProfileHeader({ onNewMission }: { onNewMission: () => void }) {
+    const { user, profile } = useAuth();
     const [editing, setEditing] = useState(false);
+    const type = profileUserType(profile);
+    const firstName = profile?.full_name?.split(' ')[0];
+
+    return (
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between animate-fade-up">
+            <div className="flex items-center gap-5">
+                <Avatar src={avatarSrc(profile)} name={profile?.full_name || user?.email} className="size-16 text-lg shadow-soft md:size-20" />
+                <div className="min-w-0">
+                    <p className="text-sm text-gray-600">{type ? USER_TYPE_LABELS[type] : 'Membre Playlife'}</p>
+                    <h1 className="truncate text-3xl font-bold md:text-4xl">Bonjour{firstName ? `, ${firstName}` : ''} 👋</h1>
+                    <button type="button" onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700">
+                        <Edit2 className="size-3.5" aria-hidden="true" /> Modifier mon profil
+                    </button>
+                </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+                <ButtonLink to="/ressources" variant="secondary" size="lg" iconRight={ArrowUpRight}>Guides &amp; ressources</ButtonLink>
+                <Button size="lg" icon={Plus} onClick={onNewMission}>Nouvelle mission</Button>
+            </div>
+            {editing && <ProfileModal onClose={() => setEditing(false)} />}
+        </div>
+    );
+}
+
+function ProfileModal({ onClose }: { onClose: () => void }) {
+    const { user, profile, refreshProfile } = useAuth();
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [fullName, setFullName] = useState('');
-    const [userType, setUserType] = useState<UserType | ''>('');
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-    const startEditing = () => {
-        setFullName(profile?.full_name ?? '');
-        setUserType(profileUserType(profile) ?? '');
-        setAvatarUrl(profile?.avatar_url ?? null);
-        setEditing(true);
-    };
+    const [fullName, setFullName] = useState(profile?.full_name ?? '');
+    const [userType, setUserType] = useState<UserType | ''>(profileUserType(profile) ?? '');
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url ?? null);
 
     const cancel = async () => {
         // Supprime un avatar envoyé mais non enregistré
         if (avatarUrl && avatarUrl !== profile?.avatar_url) await removePublicFile('avatars', avatarUrl).catch(() => undefined);
-        setEditing(false);
+        onClose();
     };
 
     const handleAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -291,12 +275,7 @@ function ProfileBanner({ onNewMission }: { onNewMission: () => void }) {
         setSaving(true);
         const { error } = await supabase
             .from('profiles')
-            .update({
-                full_name: fullName.trim() || null,
-                user_type: userType || null,
-                avatar_url: avatarUrl,
-                updated_at: new Date().toISOString(),
-            })
+            .update({ full_name: fullName.trim() || null, user_type: userType || null, avatar_url: avatarUrl, updated_at: new Date().toISOString() })
             .eq('id', user.id);
         setSaving(false);
         if (error) {
@@ -305,77 +284,49 @@ function ProfileBanner({ onNewMission }: { onNewMission: () => void }) {
         }
         if (profile?.avatar_url && profile.avatar_url !== avatarUrl) await removePublicFile('avatars', profile.avatar_url).catch(() => undefined);
         await refreshProfile();
-        setEditing(false);
         toast.success('Profil mis à jour.');
+        onClose();
     };
 
-    const type = profileUserType(profile);
-    const displayedAvatar = editing ? avatarUrl : avatarSrc(profile);
-
     return (
-        <div className="bg-gradient-to-br from-[#22081c] to-[#3d1232] rounded-3xl p-6 md:p-8 text-white">
-            <div className="flex flex-col md:flex-row md:items-center gap-6">
-                <div className="w-24 h-24 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 overflow-hidden shrink-0 relative">
-                    {displayedAvatar ? <img src={displayedAvatar} alt="" className="w-full h-full object-cover" /> : <User className="w-12 h-12 text-white/70" aria-hidden="true" />}
-                    {uploading && <span className="absolute inset-0 bg-black/50 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" aria-label="Envoi en cours" /></span>}
+        <Modal onClose={cancel} label="Modifier mon profil" className="w-full max-w-md">
+            <div className="rounded-3xl bg-white p-6 shadow-lift">
+                <div className="flex items-start justify-between">
+                    <h2 className="text-xl font-semibold">Mon profil</h2>
+                    <button type="button" onClick={cancel} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-ink-900" aria-label="Fermer"><X className="size-5" aria-hidden="true" /></button>
                 </div>
-
-                <div className="flex-1 min-w-0">
-                    {editing ? (
-                        <div className="space-y-3 max-w-md">
-                            <div>
-                                <label htmlFor="profile-name" className="block text-white/60 text-xs mb-1">Nom complet</label>
-                                <input id="profile-name" type="text" autoComplete="name" value={fullName} onChange={e => setFullName(e.target.value)}
-                                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#e6244d] text-white placeholder-white/40" />
-                            </div>
-                            <div>
-                                <label htmlFor="profile-type" className="block text-white/60 text-xs mb-1">Type de profil</label>
-                                <select id="profile-type" value={userType} onChange={e => setUserType(e.target.value as UserType | '')}
-                                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#e6244d] text-white">
-                                    <option value="" className="bg-[#22081c]">Non précisé</option>
-                                    <option value="voyageur" className="bg-[#22081c]">{USER_TYPE_LABELS.voyageur}</option>
-                                    <option value="animateur" className="bg-[#22081c]">{USER_TYPE_LABELS.animateur}</option>
-                                </select>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                <label className={`inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm hover:bg-white/20 transition-colors ${uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}>
-                                    <input type="file" accept="image/*" onChange={handleAvatar} className="sr-only" disabled={uploading} />
-                                    <Upload className="w-4 h-4" aria-hidden="true" /> {avatarUrl ? 'Changer la photo' : 'Ajouter une photo'}
-                                </label>
-                                {avatarUrl && (
-                                    <button type="button" onClick={() => setAvatarUrl(null)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-white/70 hover:text-white">
-                                        <X className="w-4 h-4" aria-hidden="true" /> Retirer
-                                    </button>
-                                )}
-                            </div>
-                            <div className="flex gap-2 pt-1">
-                                <button type="button" onClick={save} disabled={saving || uploading} className="px-4 py-2 bg-[#e6244d] rounded-lg text-sm font-bold hover:bg-[#c91d41] transition-colors disabled:opacity-50">
-                                    {saving ? 'Enregistrement…' : 'Enregistrer'}
-                                </button>
-                                <button type="button" onClick={cancel} className="px-4 py-2 bg-white/10 rounded-lg text-sm font-bold hover:bg-white/20 transition-colors">Annuler</button>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="text-white/60 text-sm mb-1">Bienvenue,</p>
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2 truncate">{profile?.full_name || user?.email}</h1>
-                            <div className="flex items-center gap-3 flex-wrap">
-                                <span className="px-3 py-1 bg-[#e6244d] rounded-full text-xs font-semibold uppercase tracking-wide">
-                                    {type ? USER_TYPE_LABELS[type] : 'Membre'}
-                                </span>
-                                <button type="button" onClick={startEditing} className="text-white/60 hover:text-white transition-colors text-xs font-medium flex items-center gap-1">
-                                    <Edit2 className="w-3 h-3" aria-hidden="true" /> Modifier le profil
-                                </button>
-                            </div>
-                        </>
-                    )}
+                <div className="mt-6 flex items-center gap-4">
+                    <div className="relative">
+                        <Avatar src={avatarUrl} name={fullName || user?.email} className="size-20 text-xl" />
+                        {uploading && <span className="absolute inset-0 flex items-center justify-center rounded-full bg-ink-950/50"><Loader2 className="size-6 animate-spin text-white" aria-label="Envoi en cours" /></span>}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <label className={cn('inline-flex h-9 items-center gap-2 rounded-lg bg-white px-3 text-sm font-medium text-ink-900 ring-1 ring-gray-200 hover:bg-gray-50', uploading ? 'pointer-events-none opacity-50' : 'cursor-pointer')}>
+                            <input type="file" accept="image/*" onChange={handleAvatar} className="sr-only" disabled={uploading} />
+                            <Upload className="size-4" aria-hidden="true" /> {avatarUrl ? 'Changer' : 'Ajouter une photo'}
+                        </label>
+                        {avatarUrl && <button type="button" onClick={() => setAvatarUrl(null)} className="h-9 rounded-lg px-3 text-sm font-medium text-gray-600 hover:bg-gray-100">Retirer</button>}
+                    </div>
                 </div>
-
-                <button type="button" onClick={onNewMission} className="shrink-0 flex items-center justify-center gap-2 bg-white text-[#22081c] px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:bg-gray-100 active:scale-95">
-                    <Plus className="w-5 h-5 text-[#e6244d]" aria-hidden="true" /> Nouvelle mission
-                </button>
+                <div className="mt-6 space-y-4">
+                    <Field id="profile-name" label="Nom complet">
+                        <Input id="profile-name" autoComplete="name" value={fullName} onChange={e => setFullName(e.target.value)} />
+                    </Field>
+                    <Field id="profile-type" label="Je suis">
+                        <Select id="profile-type" value={userType} onChange={e => setUserType(e.target.value as UserType | '')}>
+                            <option value="">Non précisé</option>
+                            <option value="voyageur">{USER_TYPE_LABELS.voyageur}</option>
+                            <option value="animateur">{USER_TYPE_LABELS.animateur}</option>
+                        </Select>
+                    </Field>
+                    <p className="text-xs text-gray-500">Email : {user?.email}</p>
+                </div>
+                <div className="mt-8 flex justify-end gap-3">
+                    <Button variant="secondary" onClick={cancel}>Annuler</Button>
+                    <Button onClick={save} loading={saving} disabled={uploading}>Enregistrer</Button>
+                </div>
             </div>
-        </div>
+        </Modal>
     );
 }
 
@@ -410,50 +361,41 @@ function MediaUploadModal({ mission, onClose }: { mission: Mission; onClose: () 
 
     return (
         <Modal onClose={onClose} label="Ajouter des photos" className="w-full max-w-lg">
-            <div className="bg-white rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-start justify-between gap-4 mb-6">
+            <div className="max-h-[90dvh] overflow-y-auto rounded-3xl bg-white p-6 shadow-lift">
+                <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold text-[#22081c]">Ajouter des photos</h2>
-                        <p className="text-sm text-gray-500 mt-1 break-words">{mission.title}</p>
+                        <h2 className="text-xl font-semibold">Partager les souvenirs</h2>
+                        <p className="mt-1 break-words text-sm text-gray-500">{mission.title}</p>
                     </div>
-                    <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1" aria-label="Fermer">
-                        <X className="w-5 h-5" aria-hidden="true" />
-                    </button>
+                    <button type="button" onClick={onClose} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-ink-900" aria-label="Fermer"><X className="size-5" aria-hidden="true" /></button>
                 </div>
 
-                <div className="space-y-4">
-                    <label className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 cursor-pointer">
-                        <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 w-4 h-4 accent-[#e6244d] shrink-0" />
-                        <span className="text-xs text-amber-900 leading-relaxed">
-                            <strong>Engagement avant publication :</strong> je confirme disposer des droits nécessaires et avoir l'accord des personnes photographiées lorsque cela est requis. Je m'engage à ne publier aucun contenu raciste, discriminatoire, violent, humiliant ou illégal. Les images doivent respecter la dignité des personnes, notamment des enfants. J'autorise Playlife à utiliser ces photos pour la communication de l'association.
-                        </span>
-                    </label>
+                <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl bg-surface-100 p-4">
+                    <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-0.5 size-4 shrink-0 accent-brand-500" />
+                    <span className="text-xs leading-relaxed text-ink-800">
+                        <strong>Engagement avant publication :</strong> je confirme disposer des droits nécessaires et avoir l'accord des personnes photographiées lorsque cela est requis. Je m'engage à ne publier aucun contenu raciste, discriminatoire, violent, humiliant ou illégal. Les images doivent respecter la dignité des personnes, notamment des enfants. J'autorise Playlife à utiliser ces photos pour la communication de l'association.
+                    </span>
+                </label>
 
-                    <label className={`block border-2 border-dashed rounded-xl p-8 text-center transition-colors ${consent && !uploading ? 'border-gray-300 hover:border-[#e6244d] cursor-pointer' : 'border-gray-200 opacity-50 cursor-not-allowed'}`}>
-                        <input type="file" accept="image/*" multiple onChange={handleFiles} className="sr-only" disabled={!consent || uploading} />
-                        <span className="flex flex-col items-center gap-3">
-                            <span className="w-16 h-16 bg-[#e6244d]/10 rounded-full flex items-center justify-center">
-                                {uploading ? <Loader2 className="w-8 h-8 text-[#e6244d] animate-spin" aria-hidden="true" /> : <Upload className="w-8 h-8 text-[#e6244d]" aria-hidden="true" />}
-                            </span>
-                            <span className="font-medium text-[#22081c]">
-                                {uploading ? 'Envoi en cours…' : consent ? 'Cliquez pour choisir des photos' : "Cochez l'engagement ci-dessus pour continuer"}
-                            </span>
-                            <span className="text-sm text-gray-500">Images uniquement, 5 Mo maximum par fichier</span>
-                        </span>
-                    </label>
+                <label className={cn('mt-4 flex flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition', consent && !uploading ? 'cursor-pointer border-gray-200 hover:border-brand-300 hover:bg-brand-50/40' : 'cursor-not-allowed border-gray-100 opacity-60')}>
+                    <input type="file" accept="image/*" multiple onChange={handleFiles} className="sr-only" disabled={!consent || uploading} />
+                    <span className="flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-500">
+                        {uploading ? <Loader2 className="size-6 animate-spin" aria-hidden="true" /> : <Camera className="size-6" aria-hidden="true" />}
+                    </span>
+                    <span className="text-sm font-medium text-ink-900">
+                        {uploading ? 'Envoi en cours…' : consent ? 'Choisir des photos' : "Cochez l'engagement pour continuer"}
+                    </span>
+                    <span className="text-xs text-gray-500">Plusieurs photos possibles · 5 Mo maximum chacune</span>
+                </label>
 
-                    {uploaded.length > 0 && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4" role="status">
-                            <p className="text-sm font-medium text-green-800 mb-2">✓ {pluralize(uploaded.length, 'photo envoyée', 'photos envoyées')}</p>
-                            <ul className="text-xs text-green-700 space-y-1">
-                                {uploaded.map((name, i) => <li key={i} className="truncate">• {name}</li>)}
-                            </ul>
-                        </div>
-                    )}
+                {uploaded.length > 0 && (
+                    <p className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800 ring-1 ring-emerald-100" role="status">
+                        <CheckCircle2 className="size-4" aria-hidden="true" /> {pluralize(uploaded.length, 'photo envoyée', 'photos envoyées')}
+                    </p>
+                )}
 
-                    <button type="button" onClick={onClose} disabled={uploading} className="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors disabled:opacity-50">
-                        Terminer
-                    </button>
+                <div className="mt-6 flex justify-end">
+                    <Button onClick={onClose} disabled={uploading}>Terminer</Button>
                 </div>
             </div>
         </Modal>

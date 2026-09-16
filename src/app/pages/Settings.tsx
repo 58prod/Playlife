@@ -5,13 +5,13 @@ import { ImpactMetricsAdmin, SlideshowAdmin } from './settings/SiteContentAdmin'
 
 export default function Settings() {
     return (
-        <div className="px-4 md:px-8 py-4 md:py-6">
-            <div className="flex flex-wrap items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-white" aria-hidden="true" />
+        <div className="container-page pt-8 lg:pt-12">
+            <div className="mb-10 flex flex-wrap items-center gap-4 animate-fade-up">
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-ink-900 text-white"><Shield className="size-6" aria-hidden="true" /></span>
+                <div>
+                    <h1 className="text-3xl font-bold md:text-4xl">Administration</h1>
+                    <p className="text-sm text-gray-500">Modération, contenus du site · version {__APP_VERSION__}</p>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#22081c]">Administration</h1>
-                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-mono rounded-full border border-gray-200">v{__APP_VERSION__}</span>
             </div>
             <MissionsAdmin />
             <StructuresAdmin />
