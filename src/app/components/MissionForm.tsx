@@ -70,8 +70,10 @@ export function MissionForm({ onClose, onSuccess, initialData }: MissionFormProp
         if (step === 1 && !form.mission_type) return 'Choisissez un type de mission.';
         if (step === 2) {
             if (!form.title.trim() || !form.country.trim() || !form.city.trim()) return 'Renseignez le titre, le pays et la ville.';
-            if (!form.start_date || !form.end_date) return 'Renseignez les dates de départ et de retour.';
-            if (form.end_date < form.start_date) return 'La date de retour doit être postérieure à la date de départ.';
+            // Dates facultatives pour une mission existante enregistrée sans dates (missions historiques, collectes)
+            const datesOptional = !!initialData && !initialData.start_date && !initialData.end_date;
+            if ((!form.start_date || !form.end_date) && !(datesOptional && !form.start_date && !form.end_date)) return 'Renseignez les dates de départ et de retour.';
+            if (form.start_date && form.end_date && form.end_date < form.start_date) return 'La date de retour doit être postérieure à la date de départ.';
         }
         if (step === 3 && !form.description.trim()) return 'Décrivez votre projet en quelques lignes.';
         return null;
@@ -111,8 +113,8 @@ export function MissionForm({ onClose, onSuccess, initialData }: MissionFormProp
             title: form.title.trim(),
             country: form.country.trim(),
             city: form.city.trim(),
-            start_date: form.start_date,
-            end_date: form.end_date,
+            start_date: form.start_date || null,
+            end_date: form.end_date || null,
             fundraising_url: form.fundraising_url.trim() || null,
             description: form.description.trim(),
             image_url: form.image_url || null,
