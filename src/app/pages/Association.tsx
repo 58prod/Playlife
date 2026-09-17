@@ -16,10 +16,12 @@ const PILLARS = [
 
 const COUNTRIES: Array<[string, string]> = [['PH', 'Philippines'], ['UY', 'Uruguay'], ['MA', 'Maroc'], ['BJ', 'Bénin'], ['DO', 'République dominicaine'], ['FR', 'France']];
 
-const PEOPLE = [
+const PEOPLE: Array<{ name: string; role: string; detail?: string }> = [
     { name: 'Alphonse Areola', role: 'Parrain', detail: 'Gardien de but, champion du monde 2018' },
     { name: 'Nando De Colo', role: 'Ambassadeur', detail: 'Basketteur international français' },
     { name: 'Edinson Cavani', role: 'Ambassadeur', detail: 'Footballeur international uruguayen' },
+    { name: 'Pauline Parmentier', role: 'Ambassadrice', detail: 'Joueuse de tennis française' },
+    { name: 'Aurore Bourçois', role: 'Ambassadrice' },
 ];
 
 const COMMITMENTS = [
@@ -109,12 +111,12 @@ export default function Association() {
                 <section className="rounded-[2rem] bg-ink-900 p-8 text-white md:p-12" aria-labelledby="people-title">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">Ils nous soutiennent</p>
                     <h2 id="people-title" className="mt-3 text-3xl font-bold text-white md:text-4xl">Parrain et ambassadeurs</h2>
-                    <ul className="mt-10 grid gap-4 md:grid-cols-3">
+                    <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {PEOPLE.map(person => (
                             <li key={person.name} className="rounded-2xl bg-white/[0.06] p-6 ring-1 ring-white/10">
                                 <span className="inline-flex rounded-full bg-brand-500 px-2.5 py-0.5 text-xs font-semibold text-white">{person.role}</span>
                                 <p className="mt-4 text-xl font-semibold text-white">{person.name}</p>
-                                <p className="mt-1 text-sm text-ink-200">{person.detail}</p>
+                                {person.detail && <p className="mt-1 text-sm text-ink-200">{person.detail}</p>}
                             </li>
                         ))}
                     </ul>
