@@ -21,7 +21,7 @@ const PEOPLE: Array<{ name: string; role: string; detail?: string }> = [
     { name: 'Nando De Colo', role: 'Ambassadeur', detail: 'Basketteur international français' },
     { name: 'Edinson Cavani', role: 'Ambassadeur', detail: 'Footballeur international uruguayen' },
     { name: 'Pauline Parmentier', role: 'Ambassadrice', detail: 'Joueuse de tennis française' },
-    { name: 'Aurore Bourçois', role: 'Ambassadrice' },
+    { name: 'Aurore Bourçois', role: 'Ambassadrice', detail: 'Championne de karaté' },
 ];
 
 const COMMITMENTS = [
