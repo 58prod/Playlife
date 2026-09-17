@@ -10,8 +10,15 @@ export function formatDate(value: string | null | undefined): string {
     return dateFormatter.format(new Date(y, m - 1, d));
 }
 
+/** « Du 12/03/2026 au 20/03/2026 », ou chaîne vide si aucune date (missions historiques). */
 export function formatDateRange(start: string | null, end: string | null): string {
+    if (!start && !end) return '';
     return `Du ${formatDate(start)} au ${formatDate(end)}`;
+}
+
+/** Photo d'illustration (banque d'images) et non photo réelle de la mission. */
+export function isIllustration(url: string | null | undefined): boolean {
+    return !!url && url.startsWith('/illustrations/');
 }
 
 export function missionLocation(mission: Pick<Mission, 'city' | 'country' | 'location'>): string {

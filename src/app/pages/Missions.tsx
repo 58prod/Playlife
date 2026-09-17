@@ -25,7 +25,7 @@ export default function Missions() {
     const [photoCounts, setPhotoCounts] = useState<Record<string, number>>({});
     const [error, setError] = useState<string | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [filter, setFilter] = useState<Filter>('active');
+    const [filter, setFilter] = useState<Filter>('all');
     const [query, setQuery] = useState('');
 
     const fetchMissions = useCallback(async () => {
@@ -75,9 +75,9 @@ export default function Missions() {
                     value={filter}
                     onChange={setFilter}
                     options={[
-                        { value: 'active', label: 'En cours', count: active.length },
-                        { value: 'completed', label: 'Terminées', count: completed.length },
                         { value: 'all', label: 'Toutes', count: all.length },
+                        { value: 'active', label: 'En cours', count: active.length },
+                        { value: 'completed', label: 'Réalisées', count: completed.length },
                     ]}
                 />
                 <div className="w-full sm:w-72">

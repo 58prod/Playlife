@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Calendar, Camera, GraduationCap, Heart, MapPin, Plane } from 'lucide-react';
-import { formatDateRange, missionLocation, pluralize } from '@/lib/format';
+import { formatDateRange, isIllustration, missionLocation, pluralize } from '@/lib/format';
 import type { Mission } from '@/types/database.types';
 import { Badge } from './ui/Badge';
 
@@ -15,9 +15,20 @@ export function MissionTypeLabel({ type }: { type: Mission['mission_type'] }) {
     );
 }
 
+export function IllustrationNote({ className = '' }: { className?: string }) {
+    return (
+        <span className={`pointer-events-none rounded-full bg-ink-950/55 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur ${className}`}>
+            Photo d'illustration
+        </span>
+    );
+}
+
 export function MissionCover({ mission, className = '' }: { mission: Pick<Mission, 'image_url' | 'title'>; className?: string }) {
     return mission.image_url ? (
-        <img src={mission.image_url} alt="" loading="lazy" className={`size-full object-cover ${className}`} />
+        <>
+            <img src={mission.image_url} alt="" loading="lazy" className={`size-full object-cover ${className}`} />
+            {isIllustration(mission.image_url) && <IllustrationNote className="absolute bottom-2 right-2" />}
+        </>
     ) : (
         <div className={`flex size-full items-center justify-center bg-gradient-to-br from-ink-800 via-ink-900 to-brand-800 ${className}`} aria-hidden="true">
             <Heart className="size-10 fill-brand-500/80 text-brand-500/80" />
@@ -45,7 +56,9 @@ export function MissionCard({ mission, photoCount = 0 }: { mission: Mission; pho
                 {mission.description && <p className="mt-2 line-clamp-2 text-sm text-gray-600">{mission.description}</p>}
                 <div className="mt-auto space-y-1.5 pt-5 text-sm text-gray-600">
                     <p className="flex items-center gap-2"><MapPin className="size-4 shrink-0 text-brand-500" aria-hidden="true" /><span className="truncate">{missionLocation(mission)}</span></p>
-                    <p className="flex items-center gap-2"><Calendar className="size-4 shrink-0 text-brand-500" aria-hidden="true" />{formatDateRange(mission.start_date, mission.end_date)}</p>
+                    {formatDateRange(mission.start_date, mission.end_date) && (
+                        <p className="flex items-center gap-2"><Calendar className="size-4 shrink-0 text-brand-500" aria-hidden="true" />{formatDateRange(mission.start_date, mission.end_date)}</p>
+                    )}
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 text-sm">
                     {completed ? (

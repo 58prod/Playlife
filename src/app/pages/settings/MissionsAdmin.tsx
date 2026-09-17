@@ -112,7 +112,7 @@ export function MissionsAdmin() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                 {mission.mission_type && <p><span className="text-gray-500">Type :</span> <span className="font-medium">{USER_TYPE_LABELS[mission.mission_type]}</span></p>}
                                                 <p className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-gray-400" aria-hidden="true" /><span className="font-medium">{missionLocation(mission)}</span></p>
-                                                <p className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-gray-400" aria-hidden="true" /><span className="font-medium">{formatDateRange(mission.start_date, mission.end_date)}</span></p>
+                                                {formatDateRange(mission.start_date, mission.end_date) && (<p className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-gray-400" aria-hidden="true" /><span className="font-medium">{formatDateRange(mission.start_date, mission.end_date)}</span></p>)}
                                                 {mission.fundraising_url && (
                                                     <p className="md:col-span-2"><span className="text-gray-500">Cagnotte :</span> <a href={mission.fundraising_url} target="_blank" rel="noopener noreferrer" className="text-brand-500 hover:underline break-all">{mission.fundraising_url}</a></p>
                                                 )}

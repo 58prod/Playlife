@@ -128,7 +128,7 @@ export default function Dashboard() {
                     </h3>
                     <p className="mt-2 flex items-center gap-1.5 text-sm text-gray-600">
                         <MapPin className="size-4 shrink-0 text-brand-500" aria-hidden="true" />
-                        <span className="truncate">{missionLocation(mission)} · {formatDateRange(mission.start_date, mission.end_date)}</span>
+                        <span className="truncate">{[missionLocation(mission), formatDateRange(mission.start_date, mission.end_date)].filter(Boolean).join(' · ')}</span>
                     </p>
                     {isCompleted && photos.length > 0 && (
                         <PhotoStrip photos={photos} missionTitle={mission.title} onOpen={() => setSlideshowMissionId(mission.id)} />

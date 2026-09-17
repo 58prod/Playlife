@@ -83,7 +83,7 @@ export default function MissionDetail() {
                 </div>
             )}
 
-            <div className="mt-6 aspect-[16/9] overflow-hidden rounded-3xl shadow-soft ring-1 ring-ink-900/[0.06] md:aspect-[21/8]">
+            <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-3xl shadow-soft ring-1 ring-ink-900/[0.06] md:aspect-[21/8]">
                 <MissionCover mission={mission} />
             </div>
 
@@ -126,10 +126,12 @@ export default function MissionDetail() {
                                 <dt className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-100 text-ink-800"><MapPin className="size-4" aria-label="Lieu" /></dt>
                                 <dd><span className="block text-gray-500">Destination</span><span className="font-semibold text-ink-900">{missionLocation(mission)}</span></dd>
                             </div>
-                            <div className="flex gap-3">
-                                <dt className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-100 text-ink-800"><Calendar className="size-4" aria-label="Dates" /></dt>
-                                <dd><span className="block text-gray-500">Dates prévues</span><span className="font-semibold text-ink-900">{formatDateRange(mission.start_date, mission.end_date)}</span></dd>
-                            </div>
+                            {formatDateRange(mission.start_date, mission.end_date) && (
+                                <div className="flex gap-3">
+                                    <dt className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-100 text-ink-800"><Calendar className="size-4" aria-label="Dates" /></dt>
+                                    <dd><span className="block text-gray-500">{completed ? 'Dates' : 'Dates prévues'}</span><span className="font-semibold text-ink-900">{formatDateRange(mission.start_date, mission.end_date)}</span></dd>
+                                </div>
+                            )}
                         </dl>
 
                         <div className="mt-6 space-y-3 border-t border-gray-100 pt-6">
