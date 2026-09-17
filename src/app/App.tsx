@@ -15,6 +15,7 @@ const Structures = lazy(() => import('./pages/Structures'));
 const CommentCaMarche = lazy(() => import('./pages/CommentCaMarche'));
 const Ressources = lazy(() => import('./pages/Ressources'));
 const Contact = lazy(() => import('./pages/Contact'));
+const Association = lazy(() => import('./pages/Association'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
@@ -48,6 +49,7 @@ function AppContent() {
             <Route path="/impact" element={<Navigate to="/comment-ca-marche" replace />} />
             <Route path="/ressources" element={<Ressources />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/qui-sommes-nous" element={<Association />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
