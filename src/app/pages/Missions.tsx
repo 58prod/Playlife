@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, HandHeart, Plus, Receipt, Search, Users } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { AlertCircle, ArrowRight, HandHeart, Heart, Plus, Receipt, Search, Users } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { errorMessage } from '@/lib/errors';
 import { fetchPhotosByMission } from '@/lib/missions';
+import { useImpactMetrics } from '@/hooks/useSiteConfig';
 import type { Mission } from '@/types/database.types';
 import { MissionCard } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
@@ -57,6 +58,12 @@ export default function Missions() {
     const active = all.filter(m => m.status !== 'completed');
     const completed = all.filter(m => m.status === 'completed');
     const q = query.trim().toLocaleLowerCase('fr');
+    // Missions réalisées mais non référencées : chiffre clé n°1 de l'accueil (modifiable en administration)
+    // moins les missions réalisées publiées ici. Masqué si le résultat est nul ou négatif.
+    const metrics = useImpactMetrics();
+    const announced = Number.parseInt(metrics.value1.replace(/\D/g, ''), 10);
+    const unlisted = Number.isFinite(announced) ? announced - completed.length : 0;
+
     const list = (filter === 'active' ? active : filter === 'completed' ? completed : all)
         .filter(m => !q || [m.title, m.city, m.country, m.description].some(v => v?.toLocaleLowerCase('fr').includes(q)));
 
@@ -99,6 +106,7 @@ export default function Missions() {
                 ) : list.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {list.map(m => <MissionCard key={m.id} mission={m} photoCount={photoCounts[m.id]} />)}
+                        {unlisted > 0 && filter !== 'active' && !q && <UnlistedMissionsCard count={unlisted} />}
                     </div>
                 ) : !error && (
                     <EmptyState
@@ -129,5 +137,25 @@ export default function Missions() {
 
             {isFormOpen && <MissionForm onClose={() => setIsFormOpen(false)} onSuccess={fetchMissions} />}
         </div>
+    );
+}
+
+/** Carte « + N autres missions réalisées » pour les actions antérieures non référencées. */
+function UnlistedMissionsCard({ count }: { count: number }) {
+    return (
+        <article className="relative flex min-h-80 flex-col justify-between overflow-hidden rounded-2xl bg-ink-900 p-6 text-white shadow-soft">
+            <div className="absolute -right-16 -top-16 size-56 rounded-full bg-brand-500/25 blur-3xl" aria-hidden="true" />
+            <Heart className="relative size-8 fill-brand-500 text-brand-500" aria-hidden="true" />
+            <div className="relative">
+                <p className="text-6xl font-bold tabular-nums">+{count}</p>
+                <h3 className="mt-2 text-xl font-semibold text-white">{count > 1 ? 'autres missions réalisées' : 'autre mission réalisée'}</h3>
+                <p className="mt-2 text-sm text-ink-200">
+                    Depuis 2018, Playlife a mené bien d'autres actions qui ne sont pas encore référencées sur la plateforme.
+                </p>
+            </div>
+            <Link to="/qui-sommes-nous" className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white after:absolute after:inset-0 hover:text-brand-200">
+                Découvrir l'association <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+        </article>
     );
 }

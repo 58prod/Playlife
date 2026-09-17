@@ -54,6 +54,7 @@ export function ImpactMetricsAdmin() {
                         <legend className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Chiffre clé 1</legend>
                         {field('value1', 'Valeur (ex : 23)')}
                         {field('label1', 'Libellé (ex : structures aidées)')}
+                        <p className="text-xs text-gray-500">Ce chiffre sert aussi à calculer, sur la page Missions, la carte « + N autres missions réalisées » (chiffre moins les missions réalisées publiées).</p>
                     </fieldset>
                     <fieldset className="space-y-4">
                         <legend className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Chiffre clé 2</legend>
