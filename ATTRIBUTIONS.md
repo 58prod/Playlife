@@ -10,7 +10,7 @@ Photos : certaines images proviennent d'[Unsplash](https://unsplash.com) (licenc
 | `senegal.jpg` | bennett tobias | https://unsplash.com/photos/nsQDm1nBGIs |
 | `maroc-casablanca.jpg` | Cuvii | https://unsplash.com/photos/7oitfNPPvSo |
 | `togo-lome.jpg` | Andrew S | https://unsplash.com/photos/mkUun63s2f0 |
-| `congo-palestine.jpg` | Luanda Bauma Primo | https://unsplash.com/photos/wCb4t3mUTDo |
+| `cagnotte-generale.jpg` | Luanda Bauma Primo | https://unsplash.com/photos/wCb4t3mUTDo |
 
 ## Photos réelles des missions
 
