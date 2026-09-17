@@ -32,7 +32,7 @@ export function Footer({ showCta = true }: { showCta?: boolean }) {
           <nav aria-label="Liens du pied de page">
             <p className="text-sm font-semibold text-ink-900">Explorer</p>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {NAV_ITEMS.map(item => (
+              {[...NAV_ITEMS, { label: 'Ressources', path: '/comment-ca-marche#ressources' }].map(item => (
                 <li key={item.path}><Link to={item.path} className="text-gray-600 hover:text-brand-600">{item.label}</Link></li>
               ))}
             </ul>

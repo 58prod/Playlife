@@ -11,7 +11,6 @@ export const NAV_ITEMS = [
   { label: 'Missions', path: '/missions' },
   { label: 'Structures', path: '/structures' },
   { label: 'Comment ça marche', path: '/comment-ca-marche' },
-  { label: 'Ressources', path: '/ressources' },
   { label: "L'association", path: '/qui-sommes-nous' },
   { label: 'Contact', path: '/contact' },
 ];
@@ -75,7 +74,7 @@ export function Header() {
           ) : (
             <div className="hidden items-center gap-2 sm:flex">
               <ButtonLink to={loginTarget} variant="ghost" size="sm">Se connecter</ButtonLink>
-              <ButtonLink to="/register" size="sm" className="lg:hidden xl:inline-flex">Créer un compte</ButtonLink>
+              <ButtonLink to="/register" size="sm">Créer un compte</ButtonLink>
             </div>
           )}
           <button

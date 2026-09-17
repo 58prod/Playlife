@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatEuro, PACK, PACK_COST } from '@/lib/playlife';
 import { DonationSimulator } from '../components/interactive/DonationSimulator';
 import { FundraisingCalculator } from '../components/interactive/FundraisingCalculator';
+import { ResourcesSection } from '../components/ResourcesSection';
 import heart from '@/assets/coeur-playlife.png';
 import { ButtonLink } from '../components/ui/Button';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -148,7 +149,7 @@ export default function CommentCaMarche() {
                         <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-start">
                             <span className="flex size-12 items-center justify-center rounded-xl bg-white text-ink-900 shadow-soft"><ShieldCheck className="size-6" aria-hidden="true" /></span>
                             <div>
-                                <h3 className="text-2xl font-bold">Un impact transparent</h3>
+                                <h3 className="text-2xl font-bold">Des dons suivis de bout en bout</h3>
                                 <p className="mt-3 text-gray-600">Chaque porteur de mission crée sa cagnotte sur {LEETCHI}. Le lien est intégré dans Playlife Connect pour garantir :</p>
                                 <ul className="mt-6 grid gap-3 sm:grid-cols-3">
                                     {['La traçabilité des dons', 'La cohérence avec la mission', 'L\'utilisation conforme des fonds'].map(item => (
@@ -186,6 +187,11 @@ export default function CommentCaMarche() {
                     </ul>
                 </div>
             </section>
+
+            {/* Ressources */}
+            <div className="container-page pt-20 lg:pt-28">
+                <ResourcesSection />
+            </div>
         </div>
     );
 }

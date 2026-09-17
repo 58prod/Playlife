@@ -1,5 +1,4 @@
 import { Camera, ClipboardCheck, Download, FileText, Handshake } from 'lucide-react';
-import { PageHeader } from '../components/ui/PageHeader';
 
 const CATEGORIES = [
     {
@@ -36,23 +35,22 @@ const CATEGORIES = [
     },
 ];
 
-export default function Ressources() {
+/** Bloc « Ressources » : guides PDF avant, pendant et après la mission. */
+export function ResourcesSection() {
     return (
-        <div className="container-page pt-8 lg:pt-14">
-            <PageHeader
-                eyebrow="Boîte à outils"
-                title="Tout pour réussir votre mission"
-                description="Guides pratiques, modèles de courrier et documents officiels pour vous accompagner avant, pendant et après votre mission."
-            />
+        <section id="ressources" className="scroll-mt-28" aria-labelledby="resources-title">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Boîte à outils</p>
+            <h2 id="resources-title" className="mt-3 text-3xl font-bold md:text-4xl">Les ressources pour réussir votre mission</h2>
+            <p className="mt-4 max-w-2xl text-lg text-gray-600">Guides pratiques, modèles de courrier et documents officiels pour vous accompagner avant, pendant et après votre mission.</p>
 
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="mt-10 grid gap-6 lg:grid-cols-3">
                 {CATEGORIES.map(category => (
-                    <section key={category.title} className="flex flex-col rounded-3xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06] md:p-8" aria-labelledby={`cat-${category.step}`}>
+                    <article key={category.title} className="flex flex-col rounded-3xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06] md:p-8">
                         <div className="flex items-center justify-between">
                             <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-500"><category.icon className="size-6" aria-hidden="true" /></span>
-                            <span className="font-display text-5xl font-bold text-ink-900/[0.07]" aria-hidden="true">0{category.step}</span>
+                            <span className="text-5xl font-bold text-ink-900/[0.07]" aria-hidden="true">0{category.step}</span>
                         </div>
-                        <h2 id={`cat-${category.step}`} className="mt-6 text-2xl font-bold">{category.title}</h2>
+                        <h3 className="mt-6 text-2xl font-bold">{category.title}</h3>
                         <p className="mt-2 text-gray-600">{category.description}</p>
                         <ul className="mt-6 space-y-2">
                             {category.docs.map(doc => (
@@ -72,9 +70,9 @@ export default function Ressources() {
                                 </li>
                             ))}
                         </ul>
-                    </section>
+                    </article>
                 ))}
             </div>
-        </div>
+        </section>
     );
 }

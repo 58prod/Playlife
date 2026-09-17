@@ -229,7 +229,7 @@ function ProfileHeader({ onNewMission }: { onNewMission: () => void }) {
                 </div>
             </div>
             <div className="flex flex-wrap gap-3">
-                <ButtonLink to="/ressources" variant="secondary" size="lg" iconRight={ArrowUpRight}>Guides &amp; ressources</ButtonLink>
+                <ButtonLink to="/comment-ca-marche#ressources" variant="secondary" size="lg" iconRight={ArrowUpRight}>Guides &amp; ressources</ButtonLink>
                 <Button size="lg" icon={Plus} onClick={onNewMission}>Nouvelle mission</Button>
             </div>
             {editing && <ProfileModal onClose={() => setEditing(false)} />}

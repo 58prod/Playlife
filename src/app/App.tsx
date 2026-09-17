@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -13,7 +13,6 @@ const Missions = lazy(() => import('./pages/Missions'));
 const MissionDetail = lazy(() => import('./pages/MissionDetail'));
 const Structures = lazy(() => import('./pages/Structures'));
 const CommentCaMarche = lazy(() => import('./pages/CommentCaMarche'));
-const Ressources = lazy(() => import('./pages/Ressources'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Association = lazy(() => import('./pages/Association'));
 const Login = lazy(() => import('./pages/Login'));
@@ -27,10 +26,29 @@ const AUTH_PAGES = ['/login', '/register', '/mot-de-passe-oublie', '/nouveau-mot
 const NO_CTA_PAGES = ['/contact', '/dashboard', '/settings'];
 
 function AppContent() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const isAuthPage = AUTH_PAGES.includes(pathname);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  // Haut de page à chaque navigation, ou défilement vers l'ancre (#ressources…) une fois la page chargée
+  const previousPath = useRef(pathname);
+  useEffect(() => {
+    const samePage = previousPath.current === pathname;
+    previousPath.current = pathname;
+    if (!hash) {
+      if (!samePage) window.scrollTo({ top: 0, behavior: 'instant' });
+      return;
+    }
+    let tries = 0;
+    const timer = setInterval(() => {
+      const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (target || ++tries > 40) {
+        clearInterval(timer);
+        // Immédiat en arrivant d'une autre page, en douceur sur la même page
+        target?.scrollIntoView({ behavior: samePage ? 'smooth' : 'instant', block: 'start' });
+      }
+    }, 50);
+    return () => clearInterval(timer);
+  }, [pathname, hash]);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -47,7 +65,7 @@ function AppContent() {
             <Route path="/structures" element={<Structures />} />
             <Route path="/comment-ca-marche" element={<CommentCaMarche />} />
             <Route path="/impact" element={<Navigate to="/comment-ca-marche" replace />} />
-            <Route path="/ressources" element={<Ressources />} />
+            <Route path="/ressources" element={<Navigate to="/comment-ca-marche#ressources" replace />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/qui-sommes-nous" element={<Association />} />
             <Route path="/login" element={<Login />} />

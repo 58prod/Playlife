@@ -11,6 +11,13 @@
   to = "/comment-ca-marche"
   status = 301
 
+# La page Ressources est désormais un bloc de « Comment ça marche »
+# (règle exacte : les PDF /ressources/*.pdf restent servis normalement)
+[[redirects]]
+  from = "/ressources"
+  to = "/comment-ca-marche#ressources"
+  status = 301
+
 # Application monopage : toutes les routes servent index.html
 [[redirects]]
   from = "/*"
