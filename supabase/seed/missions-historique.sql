@@ -2,7 +2,7 @@
 -- PLAYLIFE — HISTORIQUE DES MISSIONS RÉALISÉES (2018 → 2026)
 -- ============================================================================
 -- 13 missions terminées, reconstituées à partir de playlife.today et du compte
--- Instagram @playlife.today, plus la mission en Thaïlande de janvier 2026.
+-- Instagram @playlife.today, plus la mission au Mercy Centre de Bangkok (Thaïlande, janvier 2026).
 -- Pas de dates de départ/retour (non affichées) ; created_at approximatif pour l'ordre.
 -- Photos : illustrations Unsplash (mention « Photo d'illustration » sur le site).
 -- Ré-exécutable : identifiants fixes, mise à jour si la mission existe déjà.
@@ -10,7 +10,9 @@
 
 INSERT INTO public.missions (id, title, description, country, city, mission_type, status, visible, image_url, created_at, created_by)
 VALUES
-('891e638d-5362-56f9-ae64-ad24fcc46c8a', 'Un pack Playlife en Thaïlande', 'Un voyageur solidaire a profité de son séjour en Thaïlande pour remettre un pack Playlife à une structure locale : des ballons, des chasubles et des plots pour que les enfants puissent jouer, s''entraîner et partager des moments ensemble.', 'Thaïlande', NULL, 'voyageur', 'completed', true, '/illustrations/missions/thailande.jpg', '2026-01-20T12:00:00Z', 'b31ac163-18fc-4165-9306-bdd3759aa5d6'),
+('891e638d-5362-56f9-ae64-ad24fcc46c8a', 'Un pack Playlife pour le Mercy Centre de Bangkok', 'Un voyageur solidaire a remis un pack Playlife au Mercy Centre, à Bangkok. Fondé en 1972 par le père Joe Maier et sœur Maria dans Klong Toey, le plus grand bidonville de la ville, le centre accueille des enfants vulnérables dans ses foyers et ses écoles maternelles. Ballons, chasubles et plots : de quoi faire du sport un moment de joie et de partage au quotidien.
+
+En savoir plus : mercycentre.org', 'Thaïlande', 'Bangkok', 'voyageur', 'completed', true, '/illustrations/missions/thailande.jpg', '2026-01-20T12:00:00Z', 'b31ac163-18fc-4165-9306-bdd3759aa5d6'),
 ('82dfa0ea-403f-5ed0-8fea-53e6a7b4844a', 'Football féminin au centre CASA de Lomé', 'Une bénévole Playlife a remis des ballons et des chasubles (Playlife et Uhlsport) au centre CASA de Lomé, qui accompagne des jeunes filles en réinsertion sociale. La remise s''est terminée par un match de football.', 'Togo', 'Lomé', 'voyageur', 'completed', true, '/illustrations/missions/togo-lome.jpg', '2022-12-06T12:00:00Z', 'b31ac163-18fc-4165-9306-bdd3759aa5d6'),
 ('c0424918-58cb-5738-8729-fc45d6628408', 'Mission multisport à Casablanca', 'Une mission menée par des membres fondateurs de Playlife dans plusieurs établissements de Casablanca : l''institut Tahar Sebti, l''école primaire Oqba Ibn Nafee, le collège Haman Fatwaki et le dojo Derb Ghalef.
 
