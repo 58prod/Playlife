@@ -16,6 +16,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/** Valeurs acceptées pour le type déclaré à l'inscription. */
+const PROFILE_TYPES = ['voyageur', 'animateur', 'autre'];
+
 async function loadProfile(user: User): Promise<Profile | null> {
     const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
     if (error) {
@@ -33,7 +36,7 @@ async function loadProfile(user: User): Promise<Profile | null> {
             full_name: meta.full_name || user.email?.split('@')[0] || 'Utilisateur',
             email: user.email ?? null,
             role: meta.role || 'voyageur',
-            user_type: meta.role === 'animateur' ? 'animateur' : 'voyageur',
+            user_type: PROFILE_TYPES.includes(meta.role) ? meta.role : 'voyageur',
         })
         .select()
         .single();

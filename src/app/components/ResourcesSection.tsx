@@ -39,15 +39,15 @@ const CATEGORIES = [
 export function ResourcesSection() {
     return (
         <section id="ressources" className="scroll-mt-28" aria-labelledby="resources-title">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Boîte à outils</p>
-            <h2 id="resources-title" className="mt-3 text-3xl font-bold md:text-4xl">Les ressources pour réussir votre mission</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Boîte à outils</p>
+            <h2 id="resources-title" className="mt-3 text-section">Les ressources pour réussir votre mission</h2>
             <p className="mt-4 max-w-2xl text-lg text-gray-600">Guides pratiques, modèles de courrier et documents officiels pour vous accompagner avant, pendant et après votre mission.</p>
 
             <div className="mt-10 grid gap-6 lg:grid-cols-3">
                 {CATEGORIES.map(category => (
                     <article key={category.title} className="flex flex-col rounded-3xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06] md:p-8">
                         <div className="flex items-center justify-between">
-                            <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-500"><category.icon className="size-6" aria-hidden="true" /></span>
+                            <span className="flex size-12 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><category.icon className="size-6" aria-hidden="true" /></span>
                             <span className="text-5xl font-bold text-ink-900/[0.07]" aria-hidden="true">0{category.step}</span>
                         </div>
                         <h3 className="mt-6 text-2xl font-bold">{category.title}</h3>

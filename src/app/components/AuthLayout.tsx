@@ -17,7 +17,7 @@ export function AuthLayout({ title, subtitle, error, children }: AuthLayoutProps
         <div className="container-page grid min-h-[calc(100dvh-5rem)] gap-10 py-8 lg:grid-cols-2 lg:gap-16 lg:py-10">
             <div className="flex items-center justify-center">
                 <div className="w-full max-w-md animate-fade-up">
-                    <h1 className="text-3xl font-bold md:text-4xl">{title}</h1>
+                    <h1 className="text-section">{title}</h1>
                     {subtitle && <p className="mt-3 text-gray-600">{subtitle}</p>}
                     {error && (
                         <div className="mt-6 rounded-xl bg-red-50 p-4 text-sm text-red-700 ring-1 ring-red-100" role="alert">{error}</div>

@@ -6,11 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { errorMessage } from '@/lib/errors';
 import { cn } from '@/lib/cn';
-import { avatarSrc, formatDateRange, missionLocation, pluralize, profileUserType, USER_TYPE_LABELS } from '@/lib/format';
+import { avatarSrc, formatDateRange, missionLocation, pluralize, profileUserType, PROFILE_TYPE_LABELS } from '@/lib/format';
 import { deleteMission, deleteMissionPhoto, fetchPhotosByMission } from '@/lib/missions';
 import { PACK } from '@/lib/playlife';
 import { removePublicFile, uploadPublicFile, validateUpload } from '@/lib/storage';
-import type { Mission, MissionMedia, UserType } from '@/types/database.types';
+import type { Mission, MissionMedia, ProfileType } from '@/types/database.types';
 import { useConfirm } from '../components/ConfirmDialog';
 import { MissionCover } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
@@ -135,7 +135,7 @@ export default function Dashboard() {
                     )}
                     <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4 [&:not(:first-child)]:mt-4">
                         {isCompleted ? (
-                            <button type="button" onClick={() => setMediaUploadMission(mission)} className={cn(action, 'bg-brand-50 text-brand-700 hover:bg-brand-100')}>
+                            <button type="button" onClick={() => setMediaUploadMission(mission)} className={cn(action, 'bg-ink-900/[0.05] text-ink-900 hover:bg-ink-900/[0.08]')}>
                                 <ImagePlus className="size-4" aria-hidden="true" /> Ajouter des photos
                             </button>
                         ) : (
@@ -221,8 +221,8 @@ function ProfileHeader({ onNewMission }: { onNewMission: () => void }) {
             <div className="flex items-center gap-5">
                 <Avatar src={avatarSrc(profile)} name={profile?.full_name || user?.email} className="size-16 text-lg shadow-soft md:size-20" />
                 <div className="min-w-0">
-                    <p className="text-sm text-gray-600">{type ? USER_TYPE_LABELS[type] : 'Membre Playlife'}</p>
-                    <h1 className="truncate text-3xl font-bold md:text-4xl">Bonjour{firstName ? `, ${firstName}` : ''} 👋</h1>
+                    <p className="text-sm text-gray-600">{type ? PROFILE_TYPE_LABELS[type] : 'Membre Playlife'}</p>
+                    <h1 className="truncate text-section">Bonjour{firstName ? `, ${firstName}` : ''} 👋</h1>
                     <button type="button" onClick={() => setEditing(true)} className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700">
                         <Edit2 className="size-3.5" aria-hidden="true" /> Modifier mon profil
                     </button>
@@ -242,7 +242,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name ?? '');
-    const [userType, setUserType] = useState<UserType | ''>(profileUserType(profile) ?? '');
+    const [userType, setUserType] = useState<ProfileType | ''>(profileUserType(profile) ?? '');
     const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url ?? null);
 
     const cancel = async () => {
@@ -312,10 +312,11 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
                         <Input id="profile-name" autoComplete="name" value={fullName} onChange={e => setFullName(e.target.value)} />
                     </Field>
                     <Field id="profile-type" label="Je suis">
-                        <Select id="profile-type" value={userType} onChange={e => setUserType(e.target.value as UserType | '')}>
+                        <Select id="profile-type" value={userType} onChange={e => setUserType(e.target.value as ProfileType | '')}>
                             <option value="">Non précisé</option>
-                            <option value="voyageur">{USER_TYPE_LABELS.voyageur}</option>
-                            <option value="animateur">{USER_TYPE_LABELS.animateur}</option>
+                            <option value="voyageur">{PROFILE_TYPE_LABELS.voyageur}</option>
+                            <option value="animateur">{PROFILE_TYPE_LABELS.animateur}</option>
+                            <option value="autre">{PROFILE_TYPE_LABELS.autre}</option>
                         </Select>
                     </Field>
                     <p className="text-xs text-gray-500">Email : {user?.email}</p>
@@ -376,9 +377,9 @@ function MediaUploadModal({ mission, onClose }: { mission: Mission; onClose: () 
                     </span>
                 </label>
 
-                <label className={cn('mt-4 flex flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition', consent && !uploading ? 'cursor-pointer border-gray-200 hover:border-brand-300 hover:bg-brand-50/40' : 'cursor-not-allowed border-gray-100 opacity-60')}>
+                <label className={cn('mt-4 flex flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition', consent && !uploading ? 'cursor-pointer border-gray-200 hover:border-ink-400 hover:bg-ink-900/[0.03]' : 'cursor-not-allowed border-gray-100 opacity-60')}>
                     <input type="file" accept="image/*" multiple onChange={handleFiles} className="sr-only" disabled={!consent || uploading} />
-                    <span className="flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-500">
+                    <span className="flex size-12 items-center justify-center rounded-full bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]">
                         {uploading ? <Loader2 className="size-6 animate-spin" aria-hidden="true" /> : <Camera className="size-6" aria-hidden="true" />}
                     </span>
                     <span className="text-sm font-medium text-ink-900">

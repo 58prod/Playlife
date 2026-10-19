@@ -9,13 +9,17 @@ export function Footer({ showCta = true }: { showCta?: boolean }) {
     <footer className="mt-24">
       {showCta && (
         <div className="container-page">
-          <div className="relative overflow-hidden rounded-3xl bg-ink-900 px-6 py-10 text-white md:px-12 md:py-14">
-            <div className="absolute -right-24 -top-24 size-72 rounded-full bg-brand-500/30 blur-3xl" aria-hidden="true" />
-            <div className="absolute -bottom-32 left-1/3 size-72 rounded-full bg-ink-500/30 blur-3xl" aria-hidden="true" />
-            <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-ink-950 px-6 py-14 text-white ring-1 ring-white/10 md:px-14 md:py-18">
+            <div className="absolute -right-24 -top-28 size-96 rounded-full bg-brand-500/18 blur-3xl" aria-hidden="true" />
+            <div className="absolute -bottom-40 left-1/4 size-96 rounded-full bg-ink-500/35 blur-3xl" aria-hidden="true" />
+            <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
               <div className="max-w-xl">
-                <h2 className="text-2xl font-bold text-white md:text-3xl">Besoin d'aide pour votre mission ?</h2>
-                <p className="mt-2 text-ink-200">L'équipe Playlife vous aide à trouver une structure, préparer votre pack et lancer votre collecte.</p>
+                <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-ink-300">
+                  <span className="h-px w-8 bg-ink-300/40" aria-hidden="true" />
+                  Un coup de main
+                </p>
+                <h2 className="mt-4 text-section text-white">Besoin d'aide pour votre mission ?</h2>
+                <p className="mt-4 text-lead text-ink-200">L'équipe Playlife vous aide à trouver une structure, préparer votre pack et lancer votre collecte.</p>
               </div>
               <ButtonLink to="/contact" size="lg" iconRight={ArrowRight} className="shrink-0">Nous contacter</ButtonLink>
             </div>
@@ -33,7 +37,7 @@ export function Footer({ showCta = true }: { showCta?: boolean }) {
             <p className="text-sm font-semibold text-ink-900">Explorer</p>
             <ul className="mt-4 space-y-2.5 text-sm">
               {[...NAV_ITEMS, { label: 'Ressources', path: '/comment-ca-marche#ressources' }].map(item => (
-                <li key={item.path}><Link to={item.path} className="text-gray-600 hover:text-brand-600">{item.label}</Link></li>
+                <li key={item.path}><Link to={item.path} className="text-gray-600 transition-colors hover:text-brand-600">{item.label}</Link></li>
               ))}
             </ul>
           </nav>

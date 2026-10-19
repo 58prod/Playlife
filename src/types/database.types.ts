@@ -1,6 +1,10 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
+/** Type d'une mission : elle est portée soit par un voyageur, soit par un groupe. */
 export type UserType = 'voyageur' | 'animateur';
+
+/** Type déclaré sur un profil. Un membre peut n'être ni l'un ni l'autre. */
+export type ProfileType = UserType | 'autre';
 export type MissionStatus = 'active' | 'completed';
 export type StructureStatus = 'à valider playlife' | 'validée' | 'refusée';
 export type MediaType = 'photo' | 'video';
@@ -49,7 +53,7 @@ export interface Database {
                 email: string | null;
                 avatar_url: string | null;
                 role: string | null;
-                user_type: UserType | null;
+                user_type: ProfileType | null;
                 is_super_admin: boolean | null;
                 created_at: string;
                 updated_at: string;

@@ -52,7 +52,7 @@ export function StructureForm({ onClose, onSuccess }: StructureFormProps) {
             <form onSubmit={handleSubmit} className="flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-3xl bg-white shadow-lift">
                 <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-6">
                     <div className="flex items-center gap-3">
-                        <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500"><Building2 className="size-5" aria-hidden="true" /></span>
+                        <span className="flex size-11 items-center justify-center rounded-xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Building2 className="size-5" aria-hidden="true" /></span>
                         <div>
                             <h2 className="text-xl font-semibold">Proposer une structure</h2>
                             <p className="text-sm text-gray-500">Elle sera publiée après validation par l'équipe Playlife.</p>

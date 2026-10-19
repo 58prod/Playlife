@@ -45,11 +45,11 @@ export function MissionQuiz({ onStartMission, className }: { onStartMission: () 
 
     return (
         <div className={cn('relative overflow-hidden rounded-3xl bg-ink-900 p-6 text-white md:p-10', className)}>
-            <div className="absolute -right-20 -top-20 size-64 rounded-full bg-brand-500/25 blur-3xl" aria-hidden="true" />
+            <div className="absolute -right-20 -top-20 size-64 rounded-full bg-brand-500/12 blur-3xl" aria-hidden="true" />
             <div className="relative grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-16">
                 <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">Quiz · 30 secondes</p>
-                    <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">Quelle mission est faite pour vous ?</h2>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-300">Quiz · 30 secondes</p>
+                    <h2 className="mt-3 text-section text-white">Quelle mission est faite pour vous ?</h2>
                     <p className="mt-3 text-ink-200">Deux questions pour trouver la meilleure façon d'agir.</p>
                     {step < 2 && (
                         <div className="mt-6 flex gap-2" aria-hidden="true">

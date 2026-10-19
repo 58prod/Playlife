@@ -120,18 +120,18 @@ export default function Missions() {
 
             <section className="mt-20 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]" aria-labelledby="tips-title">
                 <div className="lg:pr-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Collecte</p>
-                    <h2 id="tips-title" className="mt-3 text-2xl font-bold md:text-3xl">Conseils pour réussir votre cagnotte</h2>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Collecte</p>
+                    <h2 id="tips-title" className="mt-3 text-title">Conseils pour réussir votre cagnotte</h2>
                 </div>
                 <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
-                    <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500"><HandHeart className="size-5" aria-hidden="true" /></span>
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><HandHeart className="size-5" aria-hidden="true" /></span>
                     <h3 className="mt-4 font-semibold">Communiquez largement</h3>
                     <p className="mt-2 text-sm text-gray-600">Partagez le lien de votre cagnotte à vos proches, votre entourage professionnel, sportif, associatif… Plus vous communiquez, plus vous augmentez vos chances de réussite.</p>
                 </div>
                 <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
-                    <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500"><Receipt className="size-5" aria-hidden="true" /></span>
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Receipt className="size-5" aria-hidden="true" /></span>
                     <h3 className="mt-4 font-semibold">Mettez en avant l'avantage fiscal</h3>
-                    <p className="mt-2 text-sm text-gray-600">Via <a href="https://www.leetchi.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500">Leetchi</a>, chaque donateur reçoit <strong className="text-ink-900">automatiquement son reçu fiscal</strong> : <strong className="text-ink-900">66 % de réduction d'impôt</strong> pour les particuliers, 60 % pour les entreprises.</p>
+                    <p className="mt-2 text-sm text-gray-600">Via <a href="https://www.leetchi.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-2 hover:decoration-brand-600">Leetchi</a>, chaque donateur reçoit <strong className="text-ink-900">automatiquement son reçu fiscal</strong> : <strong className="text-ink-900">66 % de réduction d'impôt</strong> pour les particuliers, 60 % pour les entreprises.</p>
                 </div>
             </section>
 
@@ -153,7 +153,7 @@ function UnlistedMissionsCard({ count }: { count: number }) {
                     Depuis 2018, Playlife a mené bien d'autres actions qui ne sont pas encore référencées sur la plateforme.
                 </p>
             </div>
-            <Link to="/qui-sommes-nous" className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white after:absolute after:inset-0 hover:text-brand-200">
+            <Link to="/qui-sommes-nous" className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white after:absolute after:inset-0 hover:text-ink-200">
                 Découvrir l'association <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
         </article>

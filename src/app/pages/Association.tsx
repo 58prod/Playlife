@@ -32,7 +32,7 @@ const COMMITMENTS = [
 ];
 
 function Eyebrow({ children }: { children: ReactNode }) {
-    return <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">{children}</p>;
+    return <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">{children}</p>;
 }
 
 export default function Association() {
@@ -54,7 +54,7 @@ export default function Association() {
                     </div>
                     <div>
                         <Eyebrow>Notre histoire</Eyebrow>
-                        <h2 id="story-title" className="mt-3 text-3xl font-bold md:text-4xl">Du sport pour ceux qui n'en ont pas</h2>
+                        <h2 id="story-title" className="mt-3 text-section">Un simple ballon apporte tellement !</h2>
                         <div className="mt-5 space-y-4 text-lg text-gray-600">
                             <p>Playlife est née en <strong className="text-ink-900">2015</strong>, à l'initiative de professionnels convaincus des bienfaits du sport dans l'éducation. Après plusieurs années à consolider le projet avec des partenaires et des ambassadeurs, l'association est officiellement créée en <strong className="text-ink-900">2018</strong>.</p>
                             <p>Sa mission : distribuer et envoyer du matériel sportif dans les écoles, orphelinats et établissements non équipés, souvent dans des pays défavorisés.</p>
@@ -71,12 +71,12 @@ export default function Association() {
             <section className="mt-20 bg-white py-20 lg:mt-28 lg:py-24" aria-labelledby="pillars-title">
                 <div className="container-page">
                     <Eyebrow>Notre action</Eyebrow>
-                    <h2 id="pillars-title" className="mt-3 text-3xl font-bold md:text-4xl">Trois façons d'agir</h2>
+                    <h2 id="pillars-title" className="mt-3 text-section">Trois façons d'agir</h2>
                     <div className="mt-10 grid gap-6 md:grid-cols-3">
                         {PILLARS.map(({ icon: Icon, title, text }, index) => (
                             <article key={title} className="rounded-3xl bg-surface-50 p-7 ring-1 ring-ink-900/[0.06]">
                                 <div className="flex items-center justify-between">
-                                    <span className="flex size-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-500"><Icon className="size-6" aria-hidden="true" /></span>
+                                    <span className="flex size-12 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Icon className="size-6" aria-hidden="true" /></span>
                                     <span className="text-5xl font-bold text-ink-900/[0.07]" aria-hidden="true">0{index + 1}</span>
                                 </div>
                                 <h3 className="mt-6 text-xl font-semibold">{title}</h3>
@@ -93,7 +93,7 @@ export default function Association() {
                     <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-center">
                         <div>
                             <Eyebrow>Sur le terrain</Eyebrow>
-                            <h2 id="countries-title" className="mt-3 text-3xl font-bold md:text-4xl">Des missions sur quatre continents</h2>
+                            <h2 id="countries-title" className="mt-3 text-section">Des missions sur quatre continents</h2>
                             <p className="mt-4 text-lg text-gray-600">Depuis 2018, des packs Playlife ont été remis à des enfants en Asie, en Amérique, en Afrique et en Europe. Avec Playlife Connect, chacun peut désormais ouvrir une nouvelle destination.</p>
                         </div>
                         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -109,7 +109,7 @@ export default function Association() {
 
                 {/* Parrain & ambassadeurs */}
                 <section className="rounded-[2rem] bg-ink-900 p-8 text-white md:p-12" aria-labelledby="people-title">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">Ils nous soutiennent</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-300">Ils nous soutiennent</p>
                     <h2 id="people-title" className="mt-3 text-3xl font-bold text-white md:text-4xl">Parrain et ambassadeurs</h2>
                     <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {PEOPLE.map(person => (
@@ -125,7 +125,7 @@ export default function Association() {
                 {/* Engagements */}
                 <section className="py-20 lg:py-24" aria-labelledby="commitments-title">
                     <Eyebrow>Nos engagements</Eyebrow>
-                    <h2 id="commitments-title" className="mt-3 text-3xl font-bold md:text-4xl">Une solidarité exigeante</h2>
+                    <h2 id="commitments-title" className="mt-3 text-section">Une solidarité exigeante</h2>
                     <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {COMMITMENTS.map(({ icon: Icon, title, text }) => (
                             <article key={title} className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">

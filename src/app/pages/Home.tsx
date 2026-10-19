@@ -15,9 +15,12 @@ import { MissionCard } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
 import { MissionQuiz } from '../components/interactive/MissionQuiz';
 import { Button, ButtonLink } from '../components/ui/Button';
+import { Reveal } from '../components/ui/Reveal';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 
 const DEFAULT_PHOTOS = [photo1, photo2, photo3];
+
+const PACK = ['8 à 12 ballons', 'Chasubles & plots', 'Pompe & aiguilles'];
 
 const STEPS = [
   { icon: Target, title: 'Créer la mission', text: 'Définissez le lieu, la structure et vos dates.' },
@@ -44,6 +47,16 @@ const WAYS: Array<{ type: UserType; icon: typeof Plane; title: string; text: str
     dark: true,
   },
 ];
+
+/** Intitulé de section : filet court + libellé, pour ancrer chaque bloc. */
+function Eyebrow({ children, tone = 'light' }: { children: string; tone?: 'light' | 'dark' }) {
+  return (
+    <p className={cn('flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em]', tone === 'dark' ? 'text-ink-300' : 'text-gray-500')}>
+      <span className={cn('h-px w-8', tone === 'dark' ? 'bg-ink-300/40' : 'bg-gray-300')} aria-hidden="true" />
+      {children}
+    </p>
+  );
+}
 
 function useRecentMissions() {
   const [missions, setMissions] = useState<Mission[] | null>(null);
@@ -72,17 +85,47 @@ function HeroCarousel() {
   }, [emblaApi, onSelect]);
 
   return (
-    <div className="relative">
-      <div className="overflow-hidden rounded-[2rem] shadow-lift ring-1 ring-ink-900/10" ref={emblaRef} role="region" aria-roledescription="carrousel" aria-label="Photos de missions Playlife">
-        <div className="flex">
+    <div className="relative animate-fade-up [animation-delay:150ms] lg:absolute lg:inset-y-0 lg:right-0 lg:left-[51.5%] lg:animate-none">
+      <div
+        className="h-full overflow-hidden shadow-float ring-1 ring-ink-900/10 lg:ring-0"
+        ref={emblaRef}
+        role="region"
+        aria-roledescription="carrousel"
+        aria-label="Photos de missions Playlife"
+      >
+        {/* Hauteur imposée plutôt qu'un ratio : au-delà de lg le diaporama
+            remplit toute la hauteur du hero, bord droit de l'écran compris. */}
+        <div className="flex h-[26rem] sm:h-[32rem] lg:h-full">
           {photos.map((photo, index) => (
             <div key={photo} className="min-w-0 flex-[0_0_100%]" aria-hidden={index !== selected}>
-              <img src={photo} alt={`Mission Playlife, photo ${index + 1}`} loading={index === 0 ? 'eager' : 'lazy'} className="aspect-[4/3.4] w-full object-cover lg:aspect-[4/4.2]" />
+              <img
+                src={photo}
+                alt={`Mission Playlife, photo ${index + 1}`}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                className="size-full object-cover"
+              />
             </div>
           ))}
         </div>
       </div>
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-ink-950/40 px-2.5 py-2 backdrop-blur">
+
+      {/* Un seul bandeau en verre posé au bas de la photo : le contenu du pack
+          à gauche, la navigation du diaporama à droite. */}
+      <div className="absolute inset-x-3 bottom-3 rounded-[1.25rem] bg-white/80 px-5 py-4 shadow-lift ring-1 ring-ink-900/[0.06] backdrop-blur-xl sm:inset-x-5 sm:bottom-5 sm:px-6">
+        <div>
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-gray-500">Le pack Playlife</p>
+          <ul className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-ink-900">
+            {PACK.map(item => (
+              <li key={item} className="flex items-center gap-1.5">
+                <Check className="size-3.5 shrink-0 text-ink-900/40" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="absolute left-3 top-3 flex gap-1.5 rounded-full bg-ink-950/30 px-2.5 py-2 backdrop-blur-md sm:left-5 sm:top-5 lg:left-auto lg:right-5">
         {photos.map((photo, index) => (
           <button
             key={photo}
@@ -90,19 +133,15 @@ function HeroCarousel() {
             onClick={() => emblaApi?.scrollTo(index)}
             aria-label={`Afficher la photo ${index + 1}`}
             aria-current={index === selected}
-            className={cn('h-1.5 rounded-full transition-all', index === selected ? 'w-6 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/80')}
+            className={cn(
+              'h-1.5 rounded-full transition-all duration-500 ease-[var(--ease-out-expo)]',
+              index === selected ? 'w-7 bg-white' : 'w-1.5 bg-white/55 hover:bg-white/85',
+            )}
           />
         ))}
       </div>
-      <div className="absolute -left-4 top-8 hidden rounded-2xl bg-white p-4 shadow-lift ring-1 ring-ink-900/[0.06] sm:block lg:-left-10 animate-fade-up [animation-delay:300ms]">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Le pack Playlife</p>
-        <ul className="mt-2 space-y-1 text-sm text-ink-900">
-          {['8 à 12 ballons', 'Chasubles & plots', 'Pompe & aiguilles'].map(item => (
-            <li key={item} className="flex items-center gap-2"><Check className="size-4 text-brand-500" aria-hidden="true" />{item}</li>
-          ))}
-        </ul>
-      </div>
-      <img src={heart} alt="" aria-hidden="true" className="absolute -bottom-8 -right-4 hidden w-24 rotate-6 drop-shadow-xl sm:block lg:-right-8 lg:w-28" />
+
+      <img src={heart} alt="" aria-hidden="true" className="absolute hidden w-24 -rotate-6 drop-shadow-xl lg:block lg:-left-9 lg:top-[60%] lg:w-28 animate-float-slow" />
     </div>
   );
 }
@@ -119,33 +158,35 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 -z-10 h-[38rem] bg-[radial-gradient(60%_60%_at_80%_0%,rgb(230_26_78/0.10),transparent_70%),radial-gradient(50%_50%_at_0%_30%,rgb(48_21_54/0.06),transparent_70%)]" aria-hidden="true" />
-        <div className="container-page grid items-center gap-14 pb-16 pt-8 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:pb-24 lg:pt-16">
+      <section className="relative overflow-hidden grain">
+        <div className="absolute inset-x-0 top-0 -z-10 h-[46rem] mesh-soft" aria-hidden="true" />
+        <div className="container-page grid items-center gap-14 pb-20 pt-10 lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-[1fr_1.08fr] lg:gap-20 lg:py-8">
           <div className="animate-fade-up">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink-800 shadow-soft ring-1 ring-ink-900/[0.06]">
-              <span className="size-1.5 rounded-full bg-brand-500" aria-hidden="true" />
-              Association loi 1901 · Sport & solidarité
-            </p>
-            <h1 className="mt-6 text-[2.6rem] font-bold leading-[1.02] sm:text-6xl lg:text-[4.25rem]">
-              Le sport au cœur de la <span className="relative whitespace-nowrap text-brand-500">solidarité
-                <svg className="absolute -bottom-2 left-0 w-full text-brand-200" viewBox="0 0 300 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 9c60-6 130-8 296-3" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /></svg>
+            <p className="inline-flex items-center gap-2.5 rounded-full bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-ink-800 ring-1 ring-ink-900/[0.07] backdrop-blur-xl">
+              <span className="relative flex size-1.5" aria-hidden="true">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-500/70" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-brand-500" />
               </span>
+              Association loi 1901 · Sport &amp; solidarité
+            </p>
+            <h1 className="mt-7 text-hero">
+              Le sport au cœur de la{' '}
+              <span className="text-brand-600">solidarité</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-gray-600">
+            <p className="mt-7 max-w-xl text-lead text-gray-600">
               Organisez une mission Playlife et offrez du matériel sportif à des enfants, partout dans le monde. En voyage ou avec votre groupe, on vous accompagne à chaque étape.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" onClick={startMission} iconRight={ArrowRight}>Créer une mission</Button>
               <ButtonLink to="/missions" size="lg" variant="secondary">Voir les missions</ButtonLink>
             </div>
-            <dl className="mt-12 grid max-w-md grid-cols-2 gap-6 border-t border-ink-900/[0.08] pt-8">
-              {[[metrics.value1, metrics.label1], [metrics.value2, metrics.label2]].map(([value, label]) => (
-                <div key={label}>
+            <dl className="mt-14 grid max-w-md grid-cols-2 divide-x divide-ink-900/[0.08] border-t border-ink-900/[0.08] pt-9">
+              {[[metrics.value1, metrics.label1], [metrics.value2, metrics.label2]].map(([value, label], index) => (
+                <div key={label} className={index === 1 ? 'pl-8' : 'pr-8'}>
                   <dt className="sr-only">{label}</dt>
                   <dd>
-                    <span className="block font-display text-4xl font-bold tabular-nums text-ink-900 lg:text-5xl">{value}</span>
-                    <span className="mt-1 block text-sm text-gray-600">{label}</span>
+                    <span className="block font-display text-5xl font-semibold tabular-nums tracking-[-0.04em] text-ink-900 lg:text-6xl">{value}</span>
+                    <span className="mt-2 block text-sm text-gray-600">{label}</span>
                   </dd>
                 </div>
               ))}
@@ -156,64 +197,74 @@ export default function Home() {
       </section>
 
       {/* Deux façons d'agir */}
-      <section className="container-page py-16 lg:py-24" aria-labelledby="ways-title">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Deux façons d'agir</p>
-          <h2 id="ways-title" className="mt-3 text-3xl font-bold md:text-4xl">Choisissez votre mission</h2>
-        </div>
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {WAYS.map(way => (
-            <article key={way.type} className={cn('group relative flex flex-col overflow-hidden rounded-3xl p-8 transition duration-300 hover:-translate-y-1 md:p-10', way.dark ? 'bg-ink-900 text-white shadow-lift' : 'bg-white shadow-soft ring-1 ring-ink-900/[0.06] hover:shadow-lift')}>
-              <div className={cn('absolute -right-16 -top-16 size-56 rounded-full blur-2xl', way.dark ? 'bg-brand-500/25' : 'bg-brand-100/70')} aria-hidden="true" />
-              <span className={cn('relative flex size-14 items-center justify-center rounded-2xl', way.dark ? 'bg-white/10 text-white' : 'bg-brand-50 text-brand-500')}>
+      <section className="container-page py-20 lg:py-28" aria-labelledby="ways-title">
+        <Reveal className="max-w-2xl">
+          <Eyebrow>Deux façons d'agir</Eyebrow>
+          <h2 id="ways-title" className="mt-4 text-section">Choisissez votre mission</h2>
+        </Reveal>
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          {WAYS.map((way, index) => (
+            <Reveal
+              key={way.type}
+              as="article"
+              delay={index * 110}
+              className={cn(
+                'group relative flex flex-col overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1.5 md:p-10',
+                way.dark ? 'bg-ink-900 text-white shadow-lift hover:shadow-float' : 'bg-white shadow-card ring-1 ring-ink-900/[0.07] hover:shadow-card-hover',
+              )}
+            >
+              <div className={cn('absolute -right-20 -top-20 size-64 rounded-full blur-3xl transition-opacity duration-500 group-hover:opacity-100', way.dark ? 'bg-brand-500/15 opacity-80' : 'bg-ink-900/[0.05] opacity-70')} aria-hidden="true" />
+              <span className={cn('relative flex size-15 items-center justify-center rounded-2xl ring-1 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-105', way.dark ? 'bg-white/10 text-white ring-white/15' : 'bg-ink-900/[0.04] text-ink-900 ring-ink-900/[0.07]')}>
                 <way.icon className="size-7" aria-hidden="true" />
               </span>
-              <h3 className={cn('relative mt-6 text-2xl font-bold', way.dark && 'text-white')}>{way.title}</h3>
+              <h3 className={cn('relative mt-7 text-title', way.dark && 'text-white')}>{way.title}</h3>
               <p className={cn('relative mt-3', way.dark ? 'text-ink-200' : 'text-gray-600')}>{way.text}</p>
-              <ul className="relative mt-6 space-y-3">
+              <ul className="relative mt-7 space-y-3">
                 {way.points.map(point => (
                   <li key={point} className="flex items-start gap-3 text-sm">
-                    <span className={cn('mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full', way.dark ? 'bg-brand-500 text-white' : 'bg-brand-500 text-white')}>
+                    <span className={cn('mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full', way.dark ? 'bg-white/15 text-white' : 'bg-ink-900 text-white')}>
                       <Check className="size-3" aria-hidden="true" />
                     </span>
                     <span className={way.dark ? 'text-ink-100' : 'text-ink-800'}>{point}</span>
                   </li>
                 ))}
               </ul>
-              <div className="relative mt-8 pt-2">
+              <div className="relative mt-auto pt-9">
                 <Button variant={way.dark ? 'primary' : 'dark'} onClick={startMission} iconRight={ArrowRight}>Je me lance</Button>
               </div>
-            </article>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* Quiz d'orientation */}
-      <section className="container-page pb-16 lg:pb-24" aria-label="Quiz : quelle mission est faite pour vous ?">
-        <MissionQuiz onStartMission={startMission} />
+      <section className="container-page pb-20 lg:pb-28" aria-label="Quiz : quelle mission est faite pour vous ?">
+        <Reveal>
+          <MissionQuiz onStartMission={startMission} />
+        </Reveal>
       </section>
 
       {/* Comment ça marche */}
-      <section className="bg-white py-16 lg:py-24" aria-labelledby="steps-title">
+      <section className="relative overflow-hidden bg-white py-20 lg:py-28" aria-labelledby="steps-title">
         <div className="container-page">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-2xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Comment ça marche</p>
-              <h2 id="steps-title" className="mt-3 text-3xl font-bold md:text-4xl">Cinq étapes, accompagnées par Playlife</h2>
+              <Eyebrow>Comment ça marche</Eyebrow>
+              <h2 id="steps-title" className="mt-4 text-section">Cinq étapes, accompagnées par Playlife</h2>
             </div>
             <ButtonLink to="/comment-ca-marche" variant="ghost" iconRight={ArrowRight} className="self-start md:self-auto">En savoir plus</ButtonLink>
-          </div>
-          <ol className="relative mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
-            <div className="absolute left-[10%] right-[10%] top-7 hidden h-px bg-gradient-to-r from-brand-200 via-ink-200 to-brand-200 lg:block" aria-hidden="true" />
+          </Reveal>
+          <ol className="relative mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-6">
+            <div className="absolute left-[10%] right-[10%] top-7.5 hidden h-px bg-linear-to-r from-transparent via-gray-300 to-transparent lg:block" aria-hidden="true" />
             {STEPS.map((step, index) => (
-              <li key={step.title} className="relative">
-                <span className="relative flex size-14 items-center justify-center rounded-2xl bg-surface-100 text-ink-900 ring-1 ring-ink-900/[0.06] lg:mx-auto">
+              <Reveal as="li" key={step.title} delay={index * 90} className="group relative">
+                <span className="relative flex size-15 items-center justify-center rounded-2xl bg-surface-100 text-ink-900 ring-1 ring-ink-900/[0.07] transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1 group-hover:bg-white group-hover:shadow-card-hover lg:mx-auto">
                   <step.icon className="size-6" aria-hidden="true" />
-                  <span className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white ring-4 ring-white">{index + 1}</span>
+                  <span className="absolute -right-2 -top-2 flex size-6.5 items-center justify-center rounded-full bg-brand-500 font-display text-xs font-semibold text-white ring-4 ring-white">{index + 1}</span>
                 </span>
                 <h3 className="mt-5 text-base font-semibold lg:text-center">{step.title}</h3>
                 <p className="mt-1.5 text-sm text-gray-600 lg:text-center">{step.text}</p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </div>
@@ -221,20 +272,25 @@ export default function Home() {
 
       {/* Missions récentes */}
       {(missions === null || missions.length > 0) && (
-        <section className="container-page pt-16 lg:pt-24" aria-labelledby="recent-title">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <section className="container-page pt-20 lg:pt-28" aria-labelledby="recent-title">
+          <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Sur le terrain</p>
-              <h2 id="recent-title" className="mt-3 text-3xl font-bold md:text-4xl">Missions récentes</h2>
+              <Eyebrow>Sur le terrain</Eyebrow>
+              <h2 id="recent-title" className="mt-4 text-section">Missions récentes</h2>
             </div>
-            <Link to="/missions" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700">
-              Toutes les missions <ArrowRight className="size-4" aria-hidden="true" />
+            <Link to="/missions" className="group inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700">
+              Toutes les missions
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" aria-hidden="true" />
             </Link>
-          </div>
-          <div className="mt-10">
+          </Reveal>
+          <div className="mt-12">
             {missions === null ? <CardGridSkeleton /> : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {missions.map(mission => <MissionCard key={mission.id} mission={mission} />)}
+                {missions.map((mission, index) => (
+                  <Reveal key={mission.id} delay={index * 90}>
+                    <MissionCard mission={mission} />
+                  </Reveal>
+                ))}
               </div>
             )}
           </div>

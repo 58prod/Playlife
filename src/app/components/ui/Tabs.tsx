@@ -18,7 +18,7 @@ export function Tabs<T extends string>({ value, onChange, options, label, classN
                     >
                         {option.label}
                         {option.count !== undefined && (
-                            <span className={cn('rounded-full px-1.5 text-xs tabular-nums', active ? 'bg-brand-50 text-brand-600' : 'bg-ink-900/[0.06] text-gray-500')}>{option.count}</span>
+                            <span className={cn('rounded-full px-1.5 text-xs tabular-nums', active ? 'bg-ink-900 text-white' : 'bg-ink-900/[0.06] text-gray-500')}>{option.count}</span>
                         )}
                     </button>
                 );

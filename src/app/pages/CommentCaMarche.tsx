@@ -10,7 +10,7 @@ import { ButtonLink } from '../components/ui/Button';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Tabs } from '../components/ui/Tabs';
 
-const LEETCHI = <a href="https://www.leetchi.org/project/playlife" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500">leetchi.org/project/playlife</a>;
+const LEETCHI = <a href="https://www.leetchi.org/project/playlife" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-2 hover:decoration-brand-600">leetchi.org/project/playlife</a>;
 
 type Journey = { title: string; text?: ReactNode; points?: string[] };
 
@@ -56,8 +56,8 @@ const PACK_CONTENT = [
 function SectionTitle({ eyebrow, title, children }: { eyebrow: string; title: string; children?: ReactNode }) {
     return (
         <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">{eyebrow}</p>
-            <h2 className="mt-3 text-3xl font-bold md:text-4xl">{title}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">{eyebrow}</p>
+            <h2 className="mt-3 text-section">{title}</h2>
             {children && <div className="mt-4 text-lg text-gray-600">{children}</div>}
         </div>
     );
@@ -78,7 +78,7 @@ export default function CommentCaMarche() {
             <section className="container-page" aria-labelledby="pack-title">
                 <div className="grid gap-10 rounded-[2rem] bg-ink-900 p-8 text-white md:p-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">Le cœur de la mission</p>
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-300">Le cœur de la mission</p>
                         <h2 id="pack-title" className="mt-3 text-3xl font-bold text-white md:text-4xl">Qu'est-ce qu'un pack Playlife ?</h2>
                         <p className="mt-4 text-ink-200">Du matériel sportif simple, durable et immédiatement utilisable pour permettre à des enfants de jouer, s'entraîner et partager des moments collectifs.</p>
                         <div className="mt-8 inline-flex items-center gap-4 rounded-2xl bg-white/10 p-4">
@@ -89,7 +89,7 @@ export default function CommentCaMarche() {
                     <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
                         {PACK_CONTENT.map(item => (
                             <div key={item.value} className="rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10">
-                                <p className="font-display text-2xl font-bold">{item.value} <span className="text-brand-300">{item.label}</span></p>
+                                <p className="font-display text-2xl font-semibold tracking-[-0.02em]">{item.value} <span className="text-ink-300">{item.label}</span></p>
                                 <p className="mt-1 text-sm text-ink-200">{item.text}</p>
                             </div>
                         ))}

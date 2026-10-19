@@ -235,7 +235,7 @@ export function StructuresAdmin() {
                                                     <BadgeCheck className="w-4 h-4" aria-hidden="true" /> {structure.validated_by_playlife ? 'Retirer le label' : 'Label Playlife'}
                                                 </button>
                                             )}
-                                            <button type="button" onClick={() => startEditing(structure)} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-500 rounded-lg text-sm font-medium hover:bg-brand-100 transition-colors">
+                                            <button type="button" onClick={() => startEditing(structure)} className="flex items-center gap-1.5 px-3 py-1.5 bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06] rounded-lg text-sm font-medium hover:bg-brand-100 transition-colors">
                                                 <Edit2 className="w-4 h-4" aria-hidden="true" /> Modifier
                                             </button>
                                             <button type="button" onClick={() => handleDelete(structure)} className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" aria-label={`Supprimer ${structure.name}`}>

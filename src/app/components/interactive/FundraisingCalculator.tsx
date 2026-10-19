@@ -14,7 +14,7 @@ export function FundraisingCalculator({ className, action }: { className?: strin
 
     return (
         <div className={cn('rounded-3xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06] md:p-8', className)}>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Préparer sa collecte</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Préparer sa collecte</p>
             <h3 className="mt-2 text-2xl font-bold">Quel objectif pour ma cagnotte ?</h3>
 
             <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-12">

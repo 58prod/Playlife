@@ -97,7 +97,7 @@ export function MissionsAdmin() {
                                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mission.visible ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-green-600 text-white hover:bg-green-700'}`}>
                                                 {mission.visible ? <><EyeOff className="w-4 h-4" aria-hidden="true" /> Masquer</> : <><Eye className="w-4 h-4" aria-hidden="true" /> Publier</>}
                                             </button>
-                                            <button type="button" onClick={() => setEditing(mission)} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-500 rounded-lg text-sm font-medium hover:bg-brand-100 transition-colors">
+                                            <button type="button" onClick={() => setEditing(mission)} className="flex items-center gap-1.5 px-3 py-1.5 bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06] rounded-lg text-sm font-medium hover:bg-brand-100 transition-colors">
                                                 <Edit2 className="w-4 h-4" aria-hidden="true" /> Modifier
                                             </button>
                                             <button type="button" onClick={() => handleDelete(mission)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-red-50 hover:text-red-600 transition-colors" aria-label={`Supprimer ${mission.title}`}>

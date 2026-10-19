@@ -22,7 +22,7 @@ export default function Contact() {
                     <ul className="grid gap-8 sm:grid-cols-2">
                         {CONTACTS.map(({ icon: Icon, label, value, href, wide }) => (
                             <li key={label} className={`flex gap-4 ${wide ? 'sm:col-span-2' : ''}`}>
-                                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-500"><Icon className="size-5" aria-hidden="true" /></span>
+                                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Icon className="size-5" aria-hidden="true" /></span>
                                 <div className="min-w-0">
                                     <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">{label}</p>
                                     {href ? (
@@ -42,7 +42,7 @@ export default function Contact() {
 
                 <div className="relative overflow-hidden rounded-3xl bg-ink-900 p-8 text-white md:p-10">
                     <img src={heart} alt="" aria-hidden="true" className="absolute -bottom-10 -right-10 w-48 rotate-12 opacity-90" />
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-300">Notre impact</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-300">Notre impact</p>
                     <dl className="relative mt-8 space-y-8">
                         {[[metrics.value1, metrics.label1], [metrics.value2, metrics.label2]].map(([value, label]) => (
                             <div key={label} className="flex flex-col-reverse">

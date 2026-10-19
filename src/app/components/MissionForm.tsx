@@ -186,7 +186,7 @@ export function MissionForm({ onClose, onSuccess, initialData }: MissionFormProp
                 <div className="border-b border-gray-100 px-6 pb-5 pt-6 md:px-8">
                     <div className="flex items-start justify-between gap-4">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">{isEditing ? 'Modifier la mission' : 'Nouvelle mission'}</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">{isEditing ? 'Modifier la mission' : 'Nouvelle mission'}</p>
                             <h2 className="mt-1 text-2xl font-bold">{STEPS[step - 1].title}</h2>
                         </div>
                         <button type="button" onClick={onClose} aria-label="Fermer" className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-ink-900">
@@ -287,7 +287,7 @@ export function MissionForm({ onClose, onSuccess, initialData }: MissionFormProp
                                         </div>
                                     </div>
                                 ) : (
-                                    <label className={cn('flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/60 px-6 py-10 text-center transition hover:border-brand-300 hover:bg-brand-50/40', uploadingImage ? 'pointer-events-none opacity-60' : 'cursor-pointer')}>
+                                    <label className={cn('flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/60 px-6 py-10 text-center transition hover:border-ink-400 hover:bg-ink-900/[0.03]', uploadingImage ? 'pointer-events-none opacity-60' : 'cursor-pointer')}>
                                         <input type="file" accept="image/*" onChange={handleImageChange} className="sr-only" disabled={uploadingImage} />
                                         <span className="flex size-11 items-center justify-center rounded-full bg-white text-brand-500 shadow-soft">
                                             {uploadingImage ? <Loader2 className="size-5 animate-spin" /> : <Upload className="size-5" />}

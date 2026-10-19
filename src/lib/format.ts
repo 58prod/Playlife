@@ -1,4 +1,4 @@
-import type { Mission, Profile, UserType } from '@/types/database.types';
+import type { Mission, Profile, ProfileType, UserType } from '@/types/database.types';
 
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
@@ -30,10 +30,16 @@ export const USER_TYPE_LABELS: Record<UserType, string> = {
     animateur: 'Animateur / Enseignant',
 };
 
+/** Les profils acceptent un troisième choix, que les missions n'ont pas. */
+export const PROFILE_TYPE_LABELS: Record<ProfileType, string> = {
+    ...USER_TYPE_LABELS,
+    autre: 'Autre',
+};
+
 /** Le type est stocké dans user_type (choix du profil) ou role (valeur d'inscription). */
-export function profileUserType(profile: Profile | null): UserType | null {
+export function profileUserType(profile: Profile | null): ProfileType | null {
     const value = profile?.user_type ?? profile?.role;
-    return value === 'voyageur' || value === 'animateur' ? value : null;
+    return value !== null && value !== undefined && value in PROFILE_TYPE_LABELS ? (value as ProfileType) : null;
 }
 
 /** URL d'avatar avec cache-busting stable (change uniquement quand le profil est modifié). */

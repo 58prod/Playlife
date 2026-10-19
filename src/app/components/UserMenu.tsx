@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, LayoutDashboard, LogOut, Shield, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { avatarSrc, profileUserType, USER_TYPE_LABELS } from '@/lib/format';
+import { avatarSrc, profileUserType, PROFILE_TYPE_LABELS } from '@/lib/format';
 import { cn } from '@/lib/cn';
 
 export function Avatar({ src, name, className }: { src: string | null; name?: string | null; className?: string }) {
@@ -55,7 +55,7 @@ export function UserMenu() {
                 <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 origin-top-right rounded-2xl bg-white p-2 shadow-lift ring-1 ring-ink-900/[0.06] animate-pop">
                     <div className="px-3 pb-3 pt-2">
                         <p className="truncate text-sm font-semibold text-ink-900">{name}</p>
-                        <p className="truncate text-xs text-gray-500">{type ? USER_TYPE_LABELS[type] : user.email}</p>
+                        <p className="truncate text-xs text-gray-500">{type ? PROFILE_TYPE_LABELS[type] : user.email}</p>
                     </div>
                     <div className="border-t border-gray-100 pt-2">
                         <Link role="menuitem" to="/dashboard" onClick={() => setOpen(false)} className={item}>

@@ -1,2 +1,7 @@
-/* Police auto-hébergée (pas d'appel à Google Fonts : conforme RGPD) */
+/* Polices auto-hébergées (pas d'appel à Google Fonts : conforme RGPD) */
+
+/* Inter — textes courants, interface */
 @import '@fontsource-variable/inter';
+
+/* Geist — titres. Grotesque géométrique aux formes nettes et ouvertes. */
+@import '@fontsource-variable/geist';

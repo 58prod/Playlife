@@ -44,7 +44,7 @@ export function Header() {
   const loginTarget = pathname.startsWith('/login') || pathname.startsWith('/register') ? '/login' : `/login?redirect=${encodeURIComponent(pathname)}`;
 
   return (
-    <header className={cn('sticky top-0 z-40 transition-all duration-300', scrolled || mobileOpen ? 'bg-surface-50/85 shadow-[0_1px_0_rgb(48_21_54/0.08)] backdrop-blur-xl' : 'bg-transparent')}>
+    <header className={cn('sticky top-0 z-40 transition-all duration-500 ease-[var(--ease-out-expo)]', scrolled || mobileOpen ? 'bg-surface-50/80 backdrop-blur-2xl backdrop-saturate-150' : 'bg-transparent')}>
       <div className="container-page flex h-16 items-center gap-4 lg:h-20 xl:gap-6">
         <Link to="/" className="shrink-0" aria-label="Playlife Connect — accueil">
           <img src={logo} alt="Playlife Connect" className="h-9 w-auto lg:h-10" width={800} height={229} />
@@ -57,8 +57,10 @@ export function Header() {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => cn(
-                    'relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition xl:px-4',
-                    isActive ? 'text-ink-900 after:absolute after:inset-x-3 xl:after:inset-x-4 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-brand-500' : 'text-gray-600 hover:text-ink-900 hover:bg-ink-900/[0.04]',
+                    'relative whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-all duration-300 ease-[var(--ease-out-expo)] xl:px-4',
+                    isActive
+                      ? 'bg-white text-ink-900 shadow-card ring-1 ring-ink-900/[0.06]'
+                      : 'text-gray-600 hover:bg-ink-900/[0.04] hover:text-ink-900',
                   )}
                 >
                   {item.label}
@@ -98,7 +100,7 @@ export function Header() {
                 key={item.path}
                 to={item.path}
                 end={item.path === '/'}
-                className={({ isActive }) => cn('rounded-xl px-4 py-3 font-display text-2xl font-semibold transition', isActive ? 'bg-white text-brand-500 shadow-soft' : 'text-ink-900 hover:bg-white/70')}
+                className={({ isActive }) => cn('rounded-2xl px-4 py-3 font-display text-3xl font-semibold tracking-[-0.03em] transition', isActive ? 'bg-white text-brand-500 shadow-card' : 'text-ink-900 hover:bg-white/70')}
               >
                 {item.label}
               </NavLink>
