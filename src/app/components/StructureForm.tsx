@@ -49,21 +49,21 @@ export function StructureForm({ onClose, onSuccess }: StructureFormProps) {
 
     return (
         <Modal onClose={onClose} label="Proposer une structure" className="w-full max-w-2xl">
-            <form onSubmit={handleSubmit} className="flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-3xl bg-white shadow-lift">
-                <div className="flex items-start justify-between gap-4 border-b border-gray-100 p-6">
+            <form onSubmit={handleSubmit} className="flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-[2rem] bg-white ring-1 ring-ink-900/[0.07] shadow-float">
+                <div className="flex items-start justify-between gap-4 border-b border-ink-900/[0.07] p-6 md:p-7">
                     <div className="flex items-center gap-3">
-                        <span className="flex size-11 items-center justify-center rounded-xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Building2 className="size-5" aria-hidden="true" /></span>
+                        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Building2 className="size-5" aria-hidden="true" /></span>
                         <div>
-                            <h2 className="text-xl font-semibold">Proposer une structure</h2>
-                            <p className="text-sm text-gray-500">Elle sera publiée après validation par l'équipe Playlife.</p>
+                            <h2 className="text-title">Proposer une structure</h2>
+                            <p className="mt-1 text-sm text-gray-600">Elle sera publiée après validation par l'équipe Playlife.</p>
                         </div>
                     </div>
-                    <button type="button" onClick={onClose} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-ink-900" aria-label="Fermer">
+                    <button type="button" onClick={onClose} className="rounded-full p-2 text-gray-400 transition-colors duration-300 hover:bg-ink-900/[0.05] hover:text-ink-900" aria-label="Fermer">
                         <X className="size-5" aria-hidden="true" />
                     </button>
                 </div>
 
-                <div className="flex-1 space-y-5 overflow-y-auto p-6">
+                <div className="flex-1 space-y-5 overflow-y-auto p-6 md:p-7">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <Field id="structure-name" label="Nom de la structure" required>
                             <Input {...bind('name')} required placeholder="Ex : Association sportive locale" />
@@ -98,7 +98,7 @@ export function StructureForm({ onClose, onSuccess }: StructureFormProps) {
                     <Field id="structure-origin_info" label="Comment connaissez-vous cette structure ?">
                         <Textarea {...bind('origin_info')} rows={3} placeholder="Ex : j'ai travaillé avec eux lors d'une mission précédente…" />
                     </Field>
-                    <details className="group rounded-2xl bg-surface-100 p-4 open:pb-5">
+                    <details className="group rounded-2xl bg-surface-100 p-4 ring-1 ring-ink-900/[0.05] open:pb-5">
                         <summary className="cursor-pointer list-none text-sm font-semibold text-ink-800 marker:hidden">
                             <span className="group-open:hidden">+ Ajouter une description et un site web</span>
                             <span className="hidden group-open:inline">Informations complémentaires</span>
@@ -110,7 +110,7 @@ export function StructureForm({ onClose, onSuccess }: StructureFormProps) {
                     </details>
                 </div>
 
-                <div className="flex flex-col-reverse gap-3 border-t border-gray-100 bg-gray-50/60 p-5 sm:flex-row sm:justify-end">
+                <div className="flex flex-col-reverse gap-3 border-t border-ink-900/[0.07] bg-surface-50 p-5 sm:flex-row sm:justify-end md:px-7">
                     <Button variant="secondary" onClick={onClose}>Annuler</Button>
                     <Button type="submit" loading={loading}>Soumettre la structure</Button>
                 </div>

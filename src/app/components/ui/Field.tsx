@@ -2,7 +2,7 @@ import { forwardRef, type ComponentType, type InputHTMLAttributes, type ReactNod
 import { cn } from '@/lib/cn';
 
 export const controlClass =
-    'block w-full rounded-xl bg-white px-3.5 py-2.5 text-sm text-ink-900 ring-1 ring-inset ring-gray-200 shadow-[0_1px_2px_rgb(48_21_54/0.04)] transition focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-50 disabled:text-gray-500';
+    'block w-full rounded-2xl bg-white px-4 py-2.5 text-sm text-ink-900 ring-1 ring-inset ring-ink-900/[0.09] shadow-card transition-all duration-300 ease-[var(--ease-out-expo)] hover:ring-ink-900/[0.14] focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:shadow-none';
 
 interface FieldProps {
     id: string;
@@ -16,12 +16,12 @@ interface FieldProps {
 export function Field({ id, label, hint, required, className, children }: FieldProps) {
     return (
         <div className={className}>
-            <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-ink-800">
+            <label htmlFor={id} className="mb-2 block text-sm font-medium text-ink-800">
                 {label}
-                {required && <span className="ml-0.5 text-brand-500" aria-hidden="true">*</span>}
+                {required && <span className="ml-0.5 text-ink-400" aria-hidden="true">*</span>}
             </label>
             {children}
-            {hint && <p className="mt-1.5 text-xs text-gray-500">{hint}</p>}
+            {hint && <p className="mt-2 text-xs text-gray-500">{hint}</p>}
         </div>
     );
 }
@@ -32,8 +32,8 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
     if (!Icon) return <input ref={ref} className={cn(controlClass, className)} {...props} />;
     return (
         <div className="relative">
-            <Icon className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-400" aria-hidden />
-            <input ref={ref} className={cn(controlClass, 'pl-10', className)} {...props} />
+            <Icon className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-gray-400" aria-hidden />
+            <input ref={ref} className={cn(controlClass, 'pl-10.5', className)} {...props} />
         </div>
     );
 });

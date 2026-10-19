@@ -4,7 +4,7 @@ interface TabOption<T extends string> { value: T; label: string; count?: number 
 
 export function Tabs<T extends string>({ value, onChange, options, label, className }: { value: T; onChange: (value: T) => void; options: TabOption<T>[]; label: string; className?: string }) {
     return (
-        <div role="tablist" aria-label={label} className={cn('inline-flex max-w-full gap-1 overflow-x-auto rounded-xl bg-ink-900/[0.05] p-1 [scrollbar-width:none]', className)}>
+        <div role="tablist" aria-label={label} className={cn('inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-ink-900/[0.04] p-1 ring-1 ring-ink-900/[0.06] [scrollbar-width:none]', className)}>
             {options.map(option => {
                 const active = option.value === value;
                 return (
@@ -14,7 +14,10 @@ export function Tabs<T extends string>({ value, onChange, options, label, classN
                         role="tab"
                         aria-selected={active}
                         onClick={() => onChange(option.value)}
-                        className={cn('inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition', active ? 'bg-white text-ink-900 shadow-soft' : 'text-gray-600 hover:text-ink-900')}
+                        className={cn(
+                            'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-all duration-500 ease-[var(--ease-out-expo)]',
+                            active ? 'bg-white text-ink-900 shadow-card' : 'text-gray-600 hover:text-ink-900',
+                        )}
                     >
                         {option.label}
                         {option.count !== undefined && (

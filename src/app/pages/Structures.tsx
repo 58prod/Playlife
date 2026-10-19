@@ -97,7 +97,7 @@ export default function Structures() {
     const resetFilters = () => { setQuery(''); setCountry(''); setType(''); };
 
     return (
-        <div className="container-page pt-8 lg:pt-14">
+        <>
             <PageHeader
                 eyebrow="Annuaire"
                 title="Les structures qui accueillent les enfants"
@@ -107,103 +107,105 @@ export default function Structures() {
                 actions={<Button size="lg" variant="secondary" icon={Plus} onClick={propose}>Proposer une structure</Button>}
             />
 
-            {/* Filtres */}
-            <div className="space-y-3 border-b border-ink-900/[0.08] pb-5">
-                <div className="flex flex-col gap-3 sm:flex-row">
-                    <div className="relative flex-1">
-                        <Input icon={Search} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Nom, ville, pays…" aria-label="Rechercher une structure" className="h-11" />
+            <div className="container-page pb-16 lg:pb-24">
+                {/* Filtres */}
+                <div className="space-y-3 border-b border-ink-900/[0.08] pb-6">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                        <div className="relative flex-1">
+                            <Input icon={Search} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Nom, ville, pays…" aria-label="Rechercher une structure" className="h-11" />
+                        </div>
+                        <div className="sm:w-64">
+                            <Select value={country} onChange={e => setCountry(e.target.value)} aria-label="Filtrer par pays" className="h-11">
+                                <option value="">Tous les pays ({countries.length})</option>
+                                {countries.map(([key, { label, count }]) => (
+                                    <option key={key} value={key}>{countryFlag(key.length === 2 ? key : null)} {label} ({count})</option>
+                                ))}
+                            </Select>
+                        </div>
                     </div>
-                    <div className="sm:w-64">
-                        <Select value={country} onChange={e => setCountry(e.target.value)} aria-label="Filtrer par pays" className="h-11">
-                            <option value="">Tous les pays ({countries.length})</option>
-                            {countries.map(([key, { label, count }]) => (
-                                <option key={key} value={key}>{countryFlag(key.length === 2 ? key : null)} {label} ({count})</option>
+                    {types.length > 1 && (
+                        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="group" aria-label="Filtrer par type">
+                            {[['', all.length] as const, ...types].map(([value, count]) => (
+                                <button
+                                    key={value || 'all'}
+                                    type="button"
+                                    onClick={() => setType(value)}
+                                    aria-pressed={type === value}
+                                    className={cn('inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 ring-inset transition-all duration-500 ease-[var(--ease-out-expo)]',
+                                        type === value ? 'bg-ink-900 text-white ring-ink-900' : 'bg-white text-ink-800 ring-ink-900/[0.09] hover:ring-ink-900/[0.16]')}
+                                >
+                                    {value || 'Tous les types'}
+                                    <span className={cn('text-xs tabular-nums', type === value ? 'text-ink-200' : 'text-gray-500')}>{numberFormat.format(count)}</span>
+                                </button>
                             ))}
-                        </Select>
-                    </div>
-                </div>
-                {types.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="group" aria-label="Filtrer par type">
-                        {[['', all.length] as const, ...types].map(([value, count]) => (
-                            <button
-                                key={value || 'all'}
-                                type="button"
-                                onClick={() => setType(value)}
-                                aria-pressed={type === value}
-                                className={cn('inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium ring-1 ring-inset transition',
-                                    type === value ? 'bg-ink-900 text-white ring-ink-900' : 'bg-white text-ink-800 ring-gray-200 hover:ring-gray-300')}
-                            >
-                                {value || 'Tous les types'}
-                                <span className={cn('text-xs tabular-nums', type === value ? 'text-ink-200' : 'text-gray-500')}>{numberFormat.format(count)}</span>
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Résultats */}
-            <div className="flex items-center justify-between gap-3 py-4">
-                <p className="text-sm text-gray-600" aria-live="polite">
-                    {structures === null ? 'Chargement…' : <><strong className="text-ink-900">{numberFormat.format(filtered.length)}</strong> {filtered.length > 1 ? 'structures' : 'structure'}</>}
-                    {hasFilters && <button type="button" onClick={resetFilters} className="ml-3 inline-flex items-center gap-1 font-medium text-brand-600 hover:text-brand-700"><X className="size-3.5" aria-hidden="true" />Effacer les filtres</button>}
-                </p>
-                <div className="inline-flex rounded-xl bg-ink-900/[0.05] p-1 lg:hidden" role="group" aria-label="Affichage">
-                    {([['list', 'Liste', List], ['map', 'Carte', MapIcon]] as const).map(([value, label, Icon]) => (
-                        <button key={value} type="button" onClick={() => setMobileView(value)} aria-pressed={mobileView === value}
-                            className={cn('inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition', mobileView === value ? 'bg-white text-ink-900 shadow-soft' : 'text-gray-600')}>
-                            <Icon className="size-4" aria-hidden="true" />{label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-                {/* Liste */}
-                <div ref={listRef} className={cn('lg:h-[calc(100dvh-8rem)] lg:overflow-y-auto lg:-m-1 lg:p-1 lg:pr-3 lg:[scrollbar-width:thin]', mobileView === 'map' && 'hidden lg:block')}>
-                    {structures === null ? (
-                        <div className="space-y-3">{[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}</div>
-                    ) : filtered.length === 0 ? (
-                        <EmptyState
-                            icon={Building2}
-                            title={error ? 'Impossible de charger l\'annuaire' : 'Aucune structure ne correspond'}
-                            description={error ? 'Merci de réessayer dans quelques instants.' : 'Essayez un autre mot-clé ou un autre pays.'}
-                            action={error ? <Button variant="secondary" onClick={load}>Réessayer</Button> : hasFilters && <Button variant="secondary" onClick={resetFilters}>Effacer les filtres</Button>}
-                        />
-                    ) : (
-                        <ul className="space-y-3">
-                            {filtered.slice(0, visible).map(structure => (
-                                <li key={structure.id} id={`structure-${structure.id}`}>
-                                    <StructureItem structure={structure} selected={structure.id === selectedId} isMember={!!user} onShowOnMap={hasCoordinates(structure) ? () => showOnMap(structure.id) : undefined} />
-                                </li>
-                            ))}
-                            {visible < filtered.length && (
-                                <li className="pt-2 text-center">
-                                    <Button variant="secondary" onClick={() => setVisible(v => v + PAGE)}>
-                                        Afficher plus ({numberFormat.format(filtered.length - visible)} restantes)
-                                    </Button>
-                                </li>
-                            )}
-                        </ul>
+                        </div>
                     )}
                 </div>
 
-                {/* Carte */}
-                <div className={cn('lg:sticky lg:top-24 lg:self-start', mobileView === 'list' && 'hidden lg:block')}>
-                    <div className="relative isolate h-[70dvh] overflow-hidden rounded-3xl ring-1 ring-ink-900/[0.08] shadow-soft lg:h-[calc(100dvh-8rem)]">
-                        <Suspense fallback={<Skeleton className="size-full rounded-none" />}>
-                            <StructuresMap structures={filtered} selectedId={selectedId} onSelect={selectFromMap} precise={!!user} className="size-full" />
-                        </Suspense>
-                        {!user && structures !== null && (
-                            <p className="pointer-events-none absolute inset-x-3 top-3 z-[400] mx-auto w-fit max-w-[calc(100%-1.5rem)] rounded-full bg-white/95 px-3.5 py-1.5 text-center text-xs text-gray-600 shadow-soft backdrop-blur">
-                                <Lock className="mr-1 inline size-3 -translate-y-px" aria-hidden="true" />Positions approximatives · adresses précises réservées aux membres
-                            </p>
+                {/* Résultats */}
+                <div className="flex items-center justify-between gap-3 py-4">
+                    <p className="text-sm text-gray-600" aria-live="polite">
+                        {structures === null ? 'Chargement…' : <><strong className="text-ink-900">{numberFormat.format(filtered.length)}</strong> {filtered.length > 1 ? 'structures' : 'structure'}</>}
+                        {hasFilters && <button type="button" onClick={resetFilters} className="ml-3 inline-flex items-center gap-1 font-medium text-brand-600 hover:text-brand-700"><X className="size-3.5" aria-hidden="true" />Effacer les filtres</button>}
+                    </p>
+                    <div className="inline-flex rounded-full bg-ink-900/[0.04] p-1 ring-1 ring-ink-900/[0.06] lg:hidden" role="group" aria-label="Affichage">
+                        {([['list', 'Liste', List], ['map', 'Carte', MapIcon]] as const).map(([value, label, Icon]) => (
+                            <button key={value} type="button" onClick={() => setMobileView(value)} aria-pressed={mobileView === value}
+                                className={cn('inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-500 ease-[var(--ease-out-expo)]', mobileView === value ? 'bg-white text-ink-900 shadow-card' : 'text-gray-600')}>
+                                <Icon className="size-4" aria-hidden="true" />{label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+                    {/* Liste */}
+                    <div ref={listRef} className={cn('lg:h-[calc(100dvh-8rem)] lg:overflow-y-auto lg:-m-1 lg:p-1 lg:pr-3 lg:[scrollbar-width:thin]', mobileView === 'map' && 'hidden lg:block')}>
+                        {structures === null ? (
+                            <div className="space-y-3">{[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-32 rounded-3xl" />)}</div>
+                        ) : filtered.length === 0 ? (
+                            <EmptyState
+                                icon={Building2}
+                                title={error ? 'Impossible de charger l\'annuaire' : 'Aucune structure ne correspond'}
+                                description={error ? 'Merci de réessayer dans quelques instants.' : 'Essayez un autre mot-clé ou un autre pays.'}
+                                action={error ? <Button variant="secondary" onClick={load}>Réessayer</Button> : hasFilters && <Button variant="secondary" onClick={resetFilters}>Effacer les filtres</Button>}
+                            />
+                        ) : (
+                            <ul className="space-y-3">
+                                {filtered.slice(0, visible).map(structure => (
+                                    <li key={structure.id} id={`structure-${structure.id}`}>
+                                        <StructureItem structure={structure} selected={structure.id === selectedId} isMember={!!user} onShowOnMap={hasCoordinates(structure) ? () => showOnMap(structure.id) : undefined} />
+                                    </li>
+                                ))}
+                                {visible < filtered.length && (
+                                    <li className="pt-2 text-center">
+                                        <Button variant="secondary" onClick={() => setVisible(v => v + PAGE)}>
+                                            Afficher plus ({numberFormat.format(filtered.length - visible)} restantes)
+                                        </Button>
+                                    </li>
+                                )}
+                            </ul>
                         )}
+                    </div>
+
+                    {/* Carte */}
+                    <div className={cn('lg:sticky lg:top-24 lg:self-start', mobileView === 'list' && 'hidden lg:block')}>
+                        <div className="relative isolate h-[70dvh] overflow-hidden rounded-[2rem] ring-1 ring-ink-900/[0.07] shadow-card lg:h-[calc(100dvh-8rem)]">
+                            <Suspense fallback={<Skeleton className="size-full rounded-none" />}>
+                                <StructuresMap structures={filtered} selectedId={selectedId} onSelect={selectFromMap} precise={!!user} className="size-full" />
+                            </Suspense>
+                            {!user && structures !== null && (
+                                <p className="pointer-events-none absolute inset-x-3 top-3 z-[400] mx-auto w-fit max-w-[calc(100%-1.5rem)] rounded-full bg-white/90 px-3.5 py-1.5 text-center text-xs text-gray-600 ring-1 ring-ink-900/[0.06] shadow-card backdrop-blur-xl">
+                                    <Lock className="mr-1 inline size-3 -translate-y-px" aria-hidden="true" />Positions approximatives · adresses précises réservées aux membres
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
 
             {isFormOpen && <StructureForm onClose={() => setIsFormOpen(false)} onSuccess={load} />}
-        </div>
+        </>
     );
 }
 
@@ -211,13 +213,13 @@ function StructureItem({ structure, selected, isMember, onShowOnMap }: { structu
     const place = [structure.city, countryLabel(structure)].filter(Boolean).join(', ');
     const maps = googleMapsUrl(structure);
     const flag = countryFlag(structure.country_code);
-    const action = 'inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-ink-800 ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50 hover:ring-gray-300';
+    const action = 'inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-ink-800 ring-1 ring-inset ring-ink-900/[0.09] transition-all duration-500 ease-[var(--ease-out-expo)] hover:bg-surface-50 hover:ring-ink-900/[0.16]';
 
     return (
-        <article className={cn('rounded-2xl bg-white p-4 shadow-soft ring-1 transition md:p-5', selected ? 'ring-2 ring-brand-500' : 'ring-ink-900/[0.06] hover:ring-ink-900/[0.12]')}>
+        <article className={cn('rounded-3xl bg-white p-5 shadow-card ring-1 transition-all duration-500 ease-[var(--ease-out-expo)] md:p-6', selected ? 'ring-2 ring-ink-900 shadow-card-hover' : 'ring-ink-900/[0.07] hover:shadow-card-hover hover:ring-ink-900/[0.12]')}>
             <div className="flex items-start gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-100 text-xl" aria-hidden="true">
-                    {flag || <Building2 className="size-5 text-ink-400" />}
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-xl ring-1 ring-ink-900/[0.06]" aria-hidden="true">
+                    {flag || <Building2 className="size-5 text-ink-900/45" />}
                 </span>
                 <div className="min-w-0 flex-1">
                     <h2 className="text-base font-semibold leading-snug break-words">{structure.name}</h2>
@@ -241,7 +243,7 @@ function StructureItem({ structure, selected, isMember, onShowOnMap }: { structu
                 {structure.website_url && <a href={structure.website_url} target="_blank" rel="noopener noreferrer" className={action}><Globe className="size-3.5" aria-hidden="true" />Site web<ArrowUpRight className="size-3" aria-hidden="true" /></a>}
                 {isMember && maps && <a href={maps} target="_blank" rel="noopener noreferrer" className={action}><MapPin className="size-3.5" aria-hidden="true" />Google Maps<ArrowUpRight className="size-3" aria-hidden="true" /></a>}
                 {!isMember && (
-                    <Link to="/login?redirect=/structures" className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-surface-100 px-2.5 text-xs font-medium text-ink-800 transition hover:bg-surface-200">
+                    <Link to="/login?redirect=/structures" className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface-100 px-3 text-xs font-medium text-ink-800 ring-1 ring-inset ring-ink-900/[0.05] transition-colors duration-300 hover:bg-surface-200">
                         <Lock className="size-3.5" aria-hidden="true" />Coordonnées réservées aux membres · Se connecter
                     </Link>
                 )}

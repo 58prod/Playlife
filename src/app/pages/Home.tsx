@@ -15,6 +15,7 @@ import { MissionCard } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
 import { MissionQuiz } from '../components/interactive/MissionQuiz';
 import { Button, ButtonLink } from '../components/ui/Button';
+import { Eyebrow } from '../components/ui/Eyebrow';
 import { Reveal } from '../components/ui/Reveal';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 
@@ -47,16 +48,6 @@ const WAYS: Array<{ type: UserType; icon: typeof Plane; title: string; text: str
     dark: true,
   },
 ];
-
-/** Intitulé de section : filet court + libellé, pour ancrer chaque bloc. */
-function Eyebrow({ children, tone = 'light' }: { children: string; tone?: 'light' | 'dark' }) {
-  return (
-    <p className={cn('flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em]', tone === 'dark' ? 'text-ink-300' : 'text-gray-500')}>
-      <span className={cn('h-px w-8', tone === 'dark' ? 'bg-ink-300/40' : 'bg-gray-300')} aria-hidden="true" />
-      {children}
-    </p>
-  );
-}
 
 function useRecentMissions() {
   const [missions, setMissions] = useState<Mission[] | null>(null);

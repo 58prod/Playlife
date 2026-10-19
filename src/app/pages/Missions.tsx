@@ -11,8 +11,10 @@ import { MissionCard } from '../components/MissionCard';
 import { MissionForm } from '../components/MissionForm';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Eyebrow } from '../components/ui/Eyebrow';
 import { Input } from '../components/ui/Field';
 import { PageHeader } from '../components/ui/PageHeader';
+import { Reveal } from '../components/ui/Reveal';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { Tabs } from '../components/ui/Tabs';
 
@@ -68,7 +70,7 @@ export default function Missions() {
         .filter(m => !q || [m.title, m.city, m.country, m.description].some(v => v?.toLocaleLowerCase('fr').includes(q)));
 
     return (
-        <div className="container-page pt-8 lg:pt-14">
+        <>
             <PageHeader
                 eyebrow="Missions"
                 title="Les missions Playlife"
@@ -76,85 +78,111 @@ export default function Missions() {
                 actions={<Button size="lg" icon={Plus} onClick={startMission}>Créer une mission</Button>}
             />
 
-            <div className="flex flex-col gap-3 border-b border-ink-900/[0.08] pb-6 sm:flex-row sm:items-center sm:justify-between">
-                <Tabs
-                    label="Filtrer les missions"
-                    value={filter}
-                    onChange={setFilter}
-                    options={[
-                        { value: 'all', label: 'Toutes', count: all.length },
-                        { value: 'active', label: 'En cours', count: active.length },
-                        { value: 'completed', label: 'Réalisées', count: completed.length },
-                    ]}
-                />
-                <div className="w-full sm:w-72">
-                    <Input icon={Search} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher un pays, une ville…" aria-label="Rechercher une mission" />
-                </div>
-            </div>
-
-            <div className="mt-8">
-                {error && (
-                    <div className="mb-8 flex flex-col gap-4 rounded-2xl bg-red-50 p-5 text-red-700 ring-1 ring-red-100 sm:flex-row sm:items-center" role="alert">
-                        <AlertCircle className="size-5 shrink-0" aria-hidden="true" />
-                        <p className="flex-1 text-sm">{error}</p>
-                        <Button variant="danger" size="sm" onClick={() => { setMissions(null); fetchMissions(); }}>Réessayer</Button>
-                    </div>
-                )}
-
-                {missions === null ? (
-                    <CardGridSkeleton count={6} />
-                ) : list.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                        {list.map(m => <MissionCard key={m.id} mission={m} photoCount={photoCounts[m.id]} />)}
-                        {unlisted > 0 && filter !== 'active' && !q && <UnlistedMissionsCard count={unlisted} />}
-                    </div>
-                ) : !error && (
-                    <EmptyState
-                        icon={Users}
-                        title={q ? 'Aucune mission ne correspond' : filter === 'completed' ? 'Aucune mission terminée pour le moment' : 'Aucune mission en cours'}
-                        description={q ? 'Essayez un autre mot-clé.' : 'Et si la prochaine mission était la vôtre ?'}
-                        action={!q && <Button icon={Plus} onClick={startMission}>Créer une mission</Button>}
+            <div className="container-page">
+                <div className="flex flex-col gap-4 border-b border-ink-900/[0.08] pb-7 sm:flex-row sm:items-center sm:justify-between">
+                    <Tabs
+                        label="Filtrer les missions"
+                        value={filter}
+                        onChange={setFilter}
+                        options={[
+                            { value: 'all', label: 'Toutes', count: all.length },
+                            { value: 'active', label: 'En cours', count: active.length },
+                            { value: 'completed', label: 'Réalisées', count: completed.length },
+                        ]}
                     />
-                )}
-            </div>
+                    <div className="w-full sm:w-72">
+                        <Input icon={Search} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher un pays, une ville…" aria-label="Rechercher une mission" />
+                    </div>
+                </div>
 
-            <section className="mt-20 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]" aria-labelledby="tips-title">
-                <div className="lg:pr-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Collecte</p>
-                    <h2 id="tips-title" className="mt-3 text-title">Conseils pour réussir votre cagnotte</h2>
+                <div className="mt-10">
+                    {error && (
+                        <div className="mb-10 flex flex-col gap-4 rounded-[2rem] bg-red-50 p-6 text-red-700 ring-1 ring-red-100 sm:flex-row sm:items-center" role="alert">
+                            <AlertCircle className="size-5 shrink-0" aria-hidden="true" />
+                            <p className="flex-1 text-sm">{error}</p>
+                            <Button variant="danger" size="sm" onClick={() => { setMissions(null); fetchMissions(); }}>Réessayer</Button>
+                        </div>
+                    )}
+
+                    {missions === null ? (
+                        <CardGridSkeleton count={6} />
+                    ) : list.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                            {/* Le décalage est plafonné : au-delà de six cartes, l'attente
+                                deviendrait perceptible en bas de grille. */}
+                            {list.map((m, index) => (
+                                <Reveal key={m.id} delay={Math.min(index, 5) * 90}>
+                                    <MissionCard mission={m} photoCount={photoCounts[m.id]} />
+                                </Reveal>
+                            ))}
+                            {unlisted > 0 && filter !== 'active' && !q && (
+                                <Reveal delay={Math.min(list.length, 5) * 90}>
+                                    <UnlistedMissionsCard count={unlisted} />
+                                </Reveal>
+                            )}
+                        </div>
+                    ) : !error && (
+                        <EmptyState
+                            icon={Users}
+                            title={q ? 'Aucune mission ne correspond' : filter === 'completed' ? 'Aucune mission terminée pour le moment' : 'Aucune mission en cours'}
+                            description={q ? 'Essayez un autre mot-clé.' : 'Et si la prochaine mission était la vôtre ?'}
+                            action={!q && <Button icon={Plus} onClick={startMission}>Créer une mission</Button>}
+                        />
+                    )}
                 </div>
-                <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
-                    <span className="flex size-11 items-center justify-center rounded-xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><HandHeart className="size-5" aria-hidden="true" /></span>
-                    <h3 className="mt-4 font-semibold">Communiquez largement</h3>
-                    <p className="mt-2 text-sm text-gray-600">Partagez le lien de votre cagnotte à vos proches, votre entourage professionnel, sportif, associatif… Plus vous communiquez, plus vous augmentez vos chances de réussite.</p>
-                </div>
-                <div className="rounded-2xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06]">
-                    <span className="flex size-11 items-center justify-center rounded-xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><Receipt className="size-5" aria-hidden="true" /></span>
-                    <h3 className="mt-4 font-semibold">Mettez en avant l'avantage fiscal</h3>
-                    <p className="mt-2 text-sm text-gray-600">Via <a href="https://www.leetchi.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-2 hover:decoration-brand-600">Leetchi</a>, chaque donateur reçoit <strong className="text-ink-900">automatiquement son reçu fiscal</strong> : <strong className="text-ink-900">66 % de réduction d'impôt</strong> pour les particuliers, 60 % pour les entreprises.</p>
-                </div>
-            </section>
+
+                <section className="grid gap-6 py-20 lg:grid-cols-3 lg:py-28" aria-labelledby="tips-title">
+                    <Reveal className="lg:pr-8">
+                        <Eyebrow>Collecte</Eyebrow>
+                        <h2 id="tips-title" className="mt-4 text-section">Conseils pour réussir votre cagnotte</h2>
+                    </Reveal>
+                    {[
+                        {
+                            icon: HandHeart,
+                            title: 'Communiquez largement',
+                            text: <>Partagez le lien de votre cagnotte à vos proches, votre entourage professionnel, sportif, associatif… Plus vous communiquez, plus vous augmentez vos chances de réussite.</>,
+                        },
+                        {
+                            icon: Receipt,
+                            title: 'Mettez en avant l\'avantage fiscal',
+                            text: <>Via <a href="https://www.leetchi.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 underline decoration-brand-600/30 underline-offset-2 hover:decoration-brand-600">Leetchi</a>, chaque donateur reçoit <strong className="text-ink-900">automatiquement son reçu fiscal</strong> : <strong className="text-ink-900">66 % de réduction d'impôt</strong> pour les particuliers, 60 % pour les entreprises.</>,
+                        },
+                    ].map(({ icon: Icon, title, text }, index) => (
+                        <Reveal
+                            as="article"
+                            key={title}
+                            delay={(index + 1) * 100}
+                            className="group rounded-[2rem] bg-white p-7 ring-1 ring-ink-900/[0.07] shadow-card transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1.5 hover:shadow-card-hover md:p-8"
+                        >
+                            <span className="flex size-12 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06] transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-105"><Icon className="size-5" aria-hidden="true" /></span>
+                            <h3 className="mt-6 text-lg font-semibold">{title}</h3>
+                            <p className="mt-2.5 text-sm text-gray-600">{text}</p>
+                        </Reveal>
+                    ))}
+                </section>
+            </div>
 
             {isFormOpen && <MissionForm onClose={() => setIsFormOpen(false)} onSuccess={fetchMissions} />}
-        </div>
+        </>
     );
 }
 
 /** Carte « + N autres missions réalisées » pour les actions antérieures non référencées. */
 function UnlistedMissionsCard({ count }: { count: number }) {
     return (
-        <article className="relative flex min-h-80 flex-col justify-between overflow-hidden rounded-2xl bg-ink-900 p-6 text-white shadow-soft">
-            <div className="absolute -right-16 -top-16 size-56 rounded-full bg-brand-500/25 blur-3xl" aria-hidden="true" />
+        <article className="group relative flex h-full min-h-80 flex-col justify-between overflow-hidden rounded-3xl bg-ink-900 p-7 text-white shadow-lift transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1.5 hover:shadow-float">
+            <div className="absolute -right-20 -top-20 size-64 rounded-full bg-brand-500/15 blur-3xl" aria-hidden="true" />
             <Heart className="relative size-8 fill-brand-500 text-brand-500" aria-hidden="true" />
             <div className="relative">
-                <p className="text-6xl font-bold tabular-nums">+{count}</p>
-                <h3 className="mt-2 text-xl font-semibold text-white">{count > 1 ? 'autres missions réalisées' : 'autre mission réalisée'}</h3>
-                <p className="mt-2 text-sm text-ink-200">
+                <p className="font-display text-6xl font-semibold tabular-nums tracking-[-0.04em]">+{count}</p>
+                <h3 className="mt-2.5 text-title text-white">{count > 1 ? 'autres missions réalisées' : 'autre mission réalisée'}</h3>
+                <p className="mt-3 text-sm text-ink-200">
                     Depuis 2018, Playlife a mené bien d'autres actions qui ne sont pas encore référencées sur la plateforme.
                 </p>
             </div>
-            <Link to="/qui-sommes-nous" className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white after:absolute after:inset-0 hover:text-ink-200">
-                Découvrir l'association <ArrowRight className="size-4" aria-hidden="true" />
+            <Link to="/qui-sommes-nous" className="relative mt-7 inline-flex items-center gap-2 text-sm font-semibold text-white after:absolute after:inset-0 hover:text-ink-200">
+                Découvrir l'association
+                <ArrowRight className="size-4 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:translate-x-1" aria-hidden="true" />
             </Link>
         </article>
     );

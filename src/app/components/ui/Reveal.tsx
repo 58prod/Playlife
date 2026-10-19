@@ -1,6 +1,53 @@
 import { useEffect, useRef, type CSSProperties, type ElementType, type ReactNode } from 'react';
 
 /**
+ * Registre partagé des blocs en attente d'apparition. Un seul écouteur de
+ * défilement pour toute la page, balayé une fois par image.
+ *
+ * On mesure la position plutôt que d'écouter un IntersectionObserver : un saut
+ * de défilement (ancre, touche Fin, molette rapide) peut faire passer un bloc
+ * sous puis au-dessus de l'écran sans que l'observateur ne signale quoi que ce
+ * soit — le bloc resterait alors transparent.
+ */
+const pending = new Set<HTMLElement>();
+let frame = 0;
+
+function sweep() {
+    frame = 0;
+    const limit = window.innerHeight * 0.92;
+    for (const node of pending) {
+        if (node.getBoundingClientRect().top >= limit) continue;
+        node.dataset.reveal = 'in';
+        pending.delete(node);
+    }
+    if (pending.size === 0) stopWatching();
+}
+
+function schedule() {
+    if (!frame) frame = requestAnimationFrame(sweep);
+}
+
+function startWatching() {
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+}
+
+function stopWatching() {
+    window.removeEventListener('scroll', schedule);
+    window.removeEventListener('resize', schedule);
+}
+
+function watch(node: HTMLElement) {
+    if (pending.size === 0) startWatching();
+    pending.add(node);
+    schedule();
+    return () => {
+        pending.delete(node);
+        if (pending.size === 0) stopWatching();
+    };
+}
+
+/**
  * Fait apparaître son contenu quand il entre dans le champ de vision.
  * Le style est porté par `[data-reveal]` (voir theme.css) ; ici on ne fait que
  * basculer l'attribut, une seule fois par élément.
@@ -17,29 +64,7 @@ export function Reveal({
     useEffect(() => {
         const node = ref.current;
         if (!node) return;
-
-        // Sans IntersectionObserver (ou en mouvement réduit), on affiche tout de suite.
-        if (typeof IntersectionObserver === 'undefined') {
-            node.dataset.reveal = 'in';
-            return;
-        }
-
-        const observer = new IntersectionObserver(
-            entries => {
-                for (const entry of entries) {
-                    // `top < 0` rattrape les sauts de défilement (ancre, touche Fin) :
-                    // l'élément peut passer sous puis au-dessus de l'écran sans jamais
-                    // être signalé comme visible, et resterait alors transparent.
-                    const passed = entry.boundingClientRect.top < 0;
-                    if (!entry.isIntersecting && !passed) continue;
-                    (entry.target as HTMLElement).dataset.reveal = 'in';
-                    observer.unobserve(entry.target);
-                }
-            },
-            { rootMargin: '0px 0px -12% 0px', threshold: 0.08 },
-        );
-        observer.observe(node);
-        return () => observer.disconnect();
+        return watch(node);
     }, []);
 
     return (

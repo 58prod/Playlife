@@ -1,4 +1,6 @@
 import { Camera, ClipboardCheck, Download, FileText, Handshake } from 'lucide-react';
+import { Eyebrow } from './ui/Eyebrow';
+import { Reveal } from './ui/Reveal';
 
 const CATEGORIES = [
     {
@@ -39,38 +41,45 @@ const CATEGORIES = [
 export function ResourcesSection() {
     return (
         <section id="ressources" className="scroll-mt-28" aria-labelledby="resources-title">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Boîte à outils</p>
-            <h2 id="resources-title" className="mt-3 text-section">Les ressources pour réussir votre mission</h2>
-            <p className="mt-4 max-w-2xl text-lg text-gray-600">Guides pratiques, modèles de courrier et documents officiels pour vous accompagner avant, pendant et après votre mission.</p>
+            <Reveal className="max-w-2xl">
+                <Eyebrow>Boîte à outils</Eyebrow>
+                <h2 id="resources-title" className="mt-4 text-section">Les ressources pour réussir votre mission</h2>
+                <p className="mt-5 text-lead text-gray-600">Guides pratiques, modèles de courrier et documents officiels pour vous accompagner avant, pendant et après votre mission.</p>
+            </Reveal>
 
-            <div className="mt-10 grid gap-6 lg:grid-cols-3">
-                {CATEGORIES.map(category => (
-                    <article key={category.title} className="flex flex-col rounded-3xl bg-white p-6 shadow-soft ring-1 ring-ink-900/[0.06] md:p-8">
-                        <div className="flex items-center justify-between">
-                            <span className="flex size-12 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06]"><category.icon className="size-6" aria-hidden="true" /></span>
-                            <span className="text-5xl font-bold text-ink-900/[0.07]" aria-hidden="true">0{category.step}</span>
+            <div className="mt-12 grid gap-6 lg:grid-cols-3">
+                {CATEGORIES.map((category, index) => (
+                    <Reveal
+                        as="article"
+                        key={category.title}
+                        delay={index * 100}
+                        className="group flex flex-col rounded-[2rem] bg-white p-7 ring-1 ring-ink-900/[0.07] shadow-card transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1.5 hover:shadow-card-hover md:p-8"
+                    >
+                        <div className="flex items-start justify-between">
+                            <span className="flex size-12 items-center justify-center rounded-2xl bg-ink-900/[0.04] text-ink-900 ring-1 ring-ink-900/[0.06] transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:scale-105"><category.icon className="size-6" aria-hidden="true" /></span>
+                            <span className="font-display text-5xl font-semibold tracking-[-0.04em] text-ink-900/[0.08]" aria-hidden="true">0{category.step}</span>
                         </div>
-                        <h3 className="mt-6 text-2xl font-bold">{category.title}</h3>
-                        <p className="mt-2 text-gray-600">{category.description}</p>
-                        <ul className="mt-6 space-y-2">
+                        <h3 className="mt-7 text-title">{category.title}</h3>
+                        <p className="mt-3 text-gray-600">{category.description}</p>
+                        <ul className="mt-7 space-y-2">
                             {category.docs.map(doc => (
                                 <li key={doc.file}>
                                     <a
                                         href={`/ressources/${doc.file}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="group flex items-center gap-3 rounded-xl bg-surface-50 p-3 ring-1 ring-ink-900/[0.05] transition hover:bg-white hover:shadow-soft hover:ring-ink-900/10"
+                                        className="group/doc flex items-center gap-3 rounded-2xl bg-surface-50 p-3 ring-1 ring-ink-900/[0.05] transition-all duration-500 ease-[var(--ease-out-expo)] hover:bg-white hover:ring-ink-900/10 hover:shadow-card"
                                     >
-                                        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white text-ink-700 ring-1 ring-ink-900/[0.06] group-hover:text-brand-500">
+                                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-ink-700 ring-1 ring-ink-900/[0.06] transition-colors duration-300 group-hover/doc:text-ink-900">
                                             <FileText className="size-5" aria-hidden="true" />
                                         </span>
                                         <span className="flex-1 text-sm font-medium text-ink-900">{doc.title}<span className="sr-only"> (PDF, nouvel onglet)</span></span>
-                                        <Download className="size-4 text-gray-400 transition group-hover:translate-y-0.5 group-hover:text-brand-500" aria-hidden="true" />
+                                        <Download className="size-4 text-gray-400 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover/doc:translate-y-0.5 group-hover/doc:text-ink-900" aria-hidden="true" />
                                     </a>
                                 </li>
                             ))}
                         </ul>
-                    </article>
+                    </Reveal>
                 ))}
             </div>
         </section>
