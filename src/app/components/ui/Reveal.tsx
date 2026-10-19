@@ -38,6 +38,14 @@ function stopWatching() {
 }
 
 function watch(node: HTMLElement) {
+    // Première vérification synchrone, sans attendre d'image : un onglet ouvert
+    // en arrière-plan n'en rend aucune, et tout ce qui est déjà au-dessus de la
+    // ligne de flottaison resterait transparent jusqu'au retour au premier plan.
+    if (node.getBoundingClientRect().top < window.innerHeight * 0.92) {
+        node.dataset.reveal = 'in';
+        return () => {};
+    }
+
     if (pending.size === 0) startWatching();
     pending.add(node);
     schedule();
