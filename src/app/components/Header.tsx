@@ -50,14 +50,14 @@ export function Header() {
           <img src={logo} alt="Playlife Connect" className="h-9 w-auto lg:h-10" width={800} height={229} />
         </Link>
 
-        <nav aria-label="Navigation principale" className="hidden flex-1 justify-center lg:flex">
-          <ul className="flex items-center gap-0.5 xl:gap-1">
+        <nav aria-label="Navigation principale" className="hidden flex-1 justify-center xl:flex">
+          <ul className="flex items-center gap-1">
             {NAV_ITEMS.map(item => (
               <li key={item.path}>
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => cn(
-                    'relative whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition-all duration-300 ease-[var(--ease-out-expo)] xl:px-4',
+                    'relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ease-[var(--ease-out-expo)]',
                     isActive
                       ? 'bg-white text-ink-900 shadow-card ring-1 ring-ink-900/[0.06]'
                       : 'text-gray-600 hover:bg-ink-900/[0.04] hover:text-ink-900',
@@ -70,7 +70,7 @@ export function Header() {
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-0">
+        <div className="ml-auto flex items-center gap-2 xl:ml-0">
           {user ? (
             <UserMenu />
           ) : (
@@ -85,7 +85,7 @@ export function Header() {
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-            className="flex size-10 items-center justify-center rounded-xl text-ink-900 hover:bg-ink-900/[0.05] lg:hidden"
+            className="flex size-10 items-center justify-center rounded-xl text-ink-900 hover:bg-ink-900/[0.05] xl:hidden"
           >
             {mobileOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
           </button>
@@ -93,7 +93,7 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div id="mobile-menu" className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-ink-900/[0.06] bg-surface-50 lg:hidden">
+        <div id="mobile-menu" className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-ink-900/[0.06] bg-surface-50 lg:h-[calc(100dvh-5rem)] xl:hidden">
           <nav aria-label="Navigation mobile" className="container-page flex flex-col gap-1 py-6 animate-fade-up">
             {[{ label: 'Accueil', path: '/' }, ...NAV_ITEMS].map(item => (
               <NavLink
